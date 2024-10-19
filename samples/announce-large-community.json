@@ -1,0 +1,78 @@
+{ "exabgp": "4.0.1", "time": 1729363609.4892604, "host" : "node103", "pid" : 41733, "ppid" : 41732, "counter": 34, "type": "update", "neighbor": { "address": { "local": "172.17.179.103", "peer": "172.17.179.104" }, "asn": { "local": 1, "peer": 1 } , "direction": "receive", "message": { "update": { "attribute": { "origin": "igp", "as-path": [ 12779, 12654 ], "confederation-path": [], "med": 1110, "local-preference": 100, "aggregator": "64521:10.6.39.0", "community": [ [ 12779, 10401 ], [ 12779, 65000 ] ], "large-community": [ [ 6695, 1911 , 172 ], [ 6695, 1912 , 0 ], [ 6695, 1913 , 276 ], [ 6695, 1914 , 150 ] ] }, "announce": { "ipv6 unicast": { "2001:7f8::31eb:0:1": [ { "nlri": "2001:7fb:fe15::/48" } ] } } } } } }
+
+{
+    "exabgp": "4.0.1",
+    "time": 1729363609.4892604,
+    "host": "node103",
+    "pid": 41733,
+    "ppid": 41732,
+    "counter": 34,
+    "type": "update",
+    "neighbor": {
+        "address": {
+            "local": "172.17.179.103",
+            "peer": "172.17.179.104"
+        },
+        "asn": {
+            "local": 1,
+            "peer": 1
+        },
+        "direction": "receive",
+        "message": {
+            "update": {
+                "attribute": {
+                    "origin": "igp",
+                    "as-path": [
+                        12779,
+                        12654
+                    ],
+                    "confederation-path": [],
+                    "med": 1110,
+                    "local-preference": 100,
+                    "aggregator": "64521:10.6.39.0",
+                    "community": [
+                        [
+                            12779,
+                            10401
+                        ],
+                        [
+                            12779,
+                            65000
+                        ]
+                    ],
+                    "large-community": [
+                        [
+                            6695,
+                            1911,
+                            172
+                        ],
+                        [
+                            6695,
+                            1912,
+                            0
+                        ],
+                        [
+                            6695,
+                            1913,
+                            276
+                        ],
+                        [
+                            6695,
+                            1914,
+                            150
+                        ]
+                    ]
+                },
+                "announce": {
+                    "ipv6 unicast": {
+                        "2001:7f8::31eb:0:1": [
+                            {
+                                "nlri": "2001:7fb:fe15::/48"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

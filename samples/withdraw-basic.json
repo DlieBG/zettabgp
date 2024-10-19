@@ -1,0 +1,33 @@
+{ "exabgp": "4.0.1", "time": 1729362677.302448, "host" : "node103", "pid" : 41610, "ppid" : 41609, "counter": 20, "type": "update", "neighbor": { "address": { "local": "172.17.179.103", "peer": "172.17.179.104" }, "asn": { "local": 1, "peer": 1 } , "direction": "receive", "message": { "update": { "withdraw": { "ipv4 unicast": [ { "nlri": "1.1.0.0/24" } ] } } } } }
+
+{
+    "exabgp": "4.0.1",
+    "time": 1729362677.302448,
+    "host": "node103",
+    "pid": 41610,
+    "ppid": 41609,
+    "counter": 20,
+    "type": "update",
+    "neighbor": {
+        "address": {
+            "local": "172.17.179.103",
+            "peer": "172.17.179.104"
+        },
+        "asn": {
+            "local": 1,
+            "peer": 1
+        },
+        "direction": "receive",
+        "message": {
+            "update": {
+                "withdraw": {
+                    "ipv4 unicast": [
+                        {
+                            "nlri": "1.1.0.0/24"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
