@@ -20,17 +20,18 @@ class BGPParser():
                 obj=message['neighbor'],
             )
 
-            if message.message.update.announce:
-                self._send_message(
-                    fns=self._on_announce_functions,
-                    message=message,
-                )
+            if message.message.update:
+                if message.message.update.announce:
+                    self._send_message(
+                        fns=self._on_announce_functions,
+                        message=message,
+                    )
 
-            if message.message.update.withdraw:
-                self._send_message(
-                    fns=self._on_withdraw_functions,
-                    message=message,
-                )
+                if message.message.update.withdraw:
+                    self._send_message(
+                        fns=self._on_withdraw_functions,
+                        message=message,
+                    )
 
     def on_announce(self, fn):
         '''This method registers a function to be called when a announce update message is parsed.'''
