@@ -48,7 +48,7 @@ class RabbitMQAdapter:
                 body=message.model_dump_json(),
             )
 
-            print('[rabbitmq] announce ok')
+            # print('[rabbitmq] announce ok')
 
         @parser.on_withdraw
         def on_withdraw(message: Message):
@@ -58,4 +58,4 @@ class RabbitMQAdapter:
                 body=message.model_dump_json(),
             )
 
-            print('[rabbitmq] withdraw ok')
+            # print('[rabbitmq] withdraw ok')
