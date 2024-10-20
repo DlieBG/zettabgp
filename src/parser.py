@@ -15,7 +15,7 @@ class BGPParser():
         '''This method receives a line from ExaBGP, parses it to a Message object and hands it over to all registered on_message functions.'''
         message = json.loads(line)
 
-        if message['type'] == 'update':
+        if message['type'] == 'update' and message['message']['update']:
             message = Message.model_validate(
                 obj=message['neighbor'],
             )
