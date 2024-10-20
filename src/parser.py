@@ -22,7 +22,7 @@ class BGPParser():
 
             if message.message.update.announce:
                 self._send_message(
-                    fns=self.on_announce_functions,
+                    fns=self._on_announce_functions,
                     message=message,
                 )
 
