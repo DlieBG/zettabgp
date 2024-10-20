@@ -15,7 +15,7 @@ class _Update(BaseModel):
     withdraw: Optional[dict] = None
 
 class _Message(BaseModel):
-    update: _Update
+    update: Optional[_Update] = None
 
 class Message(BaseModel):
     address: _Address
