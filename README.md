@@ -43,3 +43,9 @@ For testing purposes the queues `test_bgp_updates`, `test_bgp_announces` and `te
 
 ## Debugging
 Some sample json messages for debugging purposes from ExaBGP can be found in the `samples` directory.
+
+### Remote Port Forward
+When you want to access the MongoDB and RabbitMQ instances on the testbed, you can use a remote port forward with ssh to forward the application ports to your local machine.
+```
+ssh -L 15672:127.0.0.1:15672 -L 5672:127.0.0.1:5672 -L 27017:127.0.0.1:27017 node103
+```
