@@ -41,10 +41,10 @@ class PathAttributes(BaseModel):
     extended_community: list[int] = []
 
 class BGPUpdateMessage(BaseModel):
-    timestamp: datetime
-    peer_ip: str
-    local_ip: str
-    peer_as: int
-    local_as: int
-    withdrawn_routes: list[Network]
-    path_attributes: list[PathAttributes]
+    timestamp: datetime = datetime.now()
+    peer_ip: str = None
+    local_ip: str = None
+    peer_as: int = None
+    local_as: int = None
+    withdrawn_routes: list[Network] = []
+    path_attributes: list[PathAttributes] = []

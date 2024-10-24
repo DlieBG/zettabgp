@@ -1,4 +1,4 @@
-from message import Message
+from src.models.message import Message
 import json
 
 class BGPParser():

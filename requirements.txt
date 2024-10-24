@@ -1,2 +1,4 @@
 pydantic
+click
+rich
 pika
