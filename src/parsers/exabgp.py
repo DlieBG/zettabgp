@@ -1,7 +1,6 @@
 from src.models.update_message import BGPUpdateMessage, PathAttributes, OriginType, AsPathType, Aggregator, Network, AsPath
 from src.parsers.update_message import BGPUpdateMessageParser
 from datetime import datetime
-from rich import print
 import itertools, json
 
 class ExaBGPParser(BGPUpdateMessageParser):
@@ -119,6 +118,5 @@ class ExaBGPParser(BGPUpdateMessageParser):
                         )
                     )
 
-            print(update_message) # debugging output
             self._send_message(update_message)
             return update_message
