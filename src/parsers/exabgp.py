@@ -47,7 +47,7 @@ class ExaBGPParser(BGPUpdateMessageParser):
             entry['value'] for entry in extended_community
         ]
 
-    def parse(self, line: str):
+    def parse(self, line: str) -> BGPUpdateMessage:
         exabgp_message = json.loads(line)
         update_message = BGPUpdateMessage(
             timestamp=datetime.fromtimestamp(
@@ -121,3 +121,4 @@ class ExaBGPParser(BGPUpdateMessageParser):
 
             print(update_message) # debugging output
             self._send_message(update_message)
+            return update_message
