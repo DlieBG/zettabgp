@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 from enum import Enum
 
 class OriginType(Enum):
@@ -26,19 +27,20 @@ class Network(BaseModel):
     mask: int
 
 class PathAttributes(BaseModel):
-    origin: OriginType = None
-    as_path: AsPath = None
-    next_hop: list[str] = []
+    origin: OriginType
+    as_path: Optional[AsPath] = None
+    next_hop: Optional[list[str]] = None
     multi_exit_disc: int = 0
     local_pref: int = 100
     atomic_aggregate: bool = False
-    aggregator: Aggregator = None
-    community: list[list[int]] = [] # including large community
-    orginator_id: str = None
-    cluster_list: list[str] = []
+    aggregator: Optional[Aggregator] = None
+    community: Optional[list[list[int]]] = None
+    large_community: Optional[list[list[int]]] = None
+    extended_community: Optional[list[int]] = None
+    orginator_id: Optional[str] = None
+    cluster_list: Optional[list[str]] = None
     mp_reach_nlri: list[Network] = []
     mp_unreach_nlri: list[Network] = []
-    extended_community: list[int] = []
 
 class BGPUpdateMessage(BaseModel):
     timestamp: datetime = datetime.now()
