@@ -90,12 +90,12 @@ def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bo
     if not no_mongodb_state:
         pass
 
-    for entry in Reader(mrt_file):
-        if entry.data['type'] != {16: 'BGP4MP'}:
-            print('[dark_orange]\[WARN][/] Skipping unknown MRT type: ', end='')
-            print(entry.data['type'])
+    for message in Reader(mrt_file):
+        if message.data['type'] != {16: 'BGP4MP'}:
+            print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
+            print(message.data['type'])
             continue
 
         parser.parse(
-            mrt=entry,
+            bgp4mp_message=message,
         )
