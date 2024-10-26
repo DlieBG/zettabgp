@@ -5,6 +5,9 @@ import itertools, json
 
 class ExaBGPParser(BGPUpdateMessageParser):
     def _parse_origin(self, origin: str) -> OriginType:
+        if origin is None:
+            return None
+
         match origin:
             case 'igp':
                 return OriginType.IGP
