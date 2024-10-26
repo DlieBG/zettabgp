@@ -12,6 +12,7 @@ setup(
     install_requires=[
         'mrtparse',
         'pydantic',
+        'exabgp',
         'click',
         'rich',
         'pika',
