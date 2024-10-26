@@ -18,21 +18,19 @@ class ExaBGPParserTests(unittest.TestCase):
                 peer_as=1,
                 local_as=1,
                 withdrawn_routes=[],
-                path_attributes=[
-                    PathAttributes(
-                        origin=OriginType.IGP,
-                        next_hop=[
-                            '172.17.179.104',
-                        ],
-                        local_pref=100,
-                        mp_reach_nlri=[
-                            Network(
-                                prefix='1.1.0.0',
-                                mask=24,
-                            ),
-                        ],
-                    ),
-                ],
+                path_attributes=PathAttributes(
+                    origin=OriginType.IGP,
+                    next_hop=[
+                        '172.17.179.104',
+                    ],
+                    local_pref=100,
+                    mp_reach_nlri=[
+                        Network(
+                            prefix='1.1.0.0',
+                            mask=24,
+                        ),
+                    ],
+                ),
             ),
         )
 
@@ -48,21 +46,19 @@ class ExaBGPParserTests(unittest.TestCase):
                 peer_as=1,
                 local_as=1,
                 withdrawn_routes=[],
-                path_attributes=[
-                    PathAttributes(
-                        origin=OriginType.IGP,
-                        next_hop=[
-                            '172.17.179.104',
-                        ],
-                        local_pref=100,
-                        mp_reach_nlri=[
-                            Network(
-                                prefix='1.1.0.0',
-                                mask=25,
-                            ),
-                        ],
-                    ),
-                ],
+                path_attributes=PathAttributes(
+                    origin=OriginType.IGP,
+                    next_hop=[
+                        '172.17.179.104',
+                    ],
+                    local_pref=100,
+                    mp_reach_nlri=[
+                        Network(
+                            prefix='1.1.0.0',
+                            mask=25,
+                        ),
+                    ],
+                ),
             ),
         )
 
@@ -78,65 +74,63 @@ class ExaBGPParserTests(unittest.TestCase):
                 peer_as=1,
                 local_as=1,
                 withdrawn_routes=[],
-                path_attributes=[
-                    PathAttributes(
-                        origin=OriginType.IGP,
-                        as_path=AsPath(
-                            type=AsPathType.AS_SEQUENCE,
-                            value=[
-                                12779,
-                                12654,
-                            ],
-                        ),
-                        next_hop=[
-                            '2001:7f8::31eb:0:1',
-                        ],
-                        multi_exit_disc=1110,
-                        local_pref=100,
-                        aggregator=Aggregator(
-                            router_id='10.6.39.0',
-                            router_as=64521,
-                        ),
-                        community=[
-                            [
-                                12779,
-                                10401,
-                            ],
-                            [
-                                12779,
-                                65000,
-                            ],
-                        ],
-                        large_community=[
-                            [
-                                6695,
-                                1911,
-                                172,
-                            ],
-                            [
-                                6695,
-                                1912,
-                                0,
-                            ],
-                            [
-                                6695,
-                                1913,
-                                276,
-                            ],
-                            [
-                                6695,
-                                1914,
-                                150,
-                            ],
-                        ],
-                        mp_reach_nlri=[
-                            Network(
-                                prefix='2001:7fb:fe15::',
-                                mask=48,
-                            ),
+                path_attributes=PathAttributes(
+                    origin=OriginType.IGP,
+                    as_path=AsPath(
+                        type=AsPathType.AS_SEQUENCE,
+                        value=[
+                            12779,
+                            12654,
                         ],
                     ),
-                ],
+                    next_hop=[
+                        '2001:7f8::31eb:0:1',
+                    ],
+                    multi_exit_disc=1110,
+                    local_pref=100,
+                    aggregator=Aggregator(
+                        router_id='10.6.39.0',
+                        router_as=64521,
+                    ),
+                    community=[
+                        [
+                            12779,
+                            10401,
+                        ],
+                        [
+                            12779,
+                            65000,
+                        ],
+                    ],
+                    large_community=[
+                        [
+                            6695,
+                            1911,
+                            172,
+                        ],
+                        [
+                            6695,
+                            1912,
+                            0,
+                        ],
+                        [
+                            6695,
+                            1913,
+                            276,
+                        ],
+                        [
+                            6695,
+                            1914,
+                            150,
+                        ],
+                    ],
+                    mp_reach_nlri=[
+                        Network(
+                            prefix='2001:7fb:fe15::',
+                            mask=48,
+                        ),
+                    ],
+                ),
             ),
         )
     
@@ -157,6 +151,6 @@ class ExaBGPParserTests(unittest.TestCase):
                         mask=24,
                     ),
                 ],
-                path_attributes=[],
+                path_attributes=None,
             ),
         )

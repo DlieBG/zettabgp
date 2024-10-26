@@ -49,4 +49,4 @@ class BGPUpdateMessage(BaseModel):
     peer_as: int = None
     local_as: int = None
     withdrawn_routes: list[Network] = []
-    path_attributes: list[PathAttributes] = []
+    path_attributes: Optional[PathAttributes] = None

@@ -89,33 +89,31 @@ class ExaBGPParser(BGPUpdateMessageParser):
                 if exabgp_message['neighbor']['message']['update'].get('attribute'):
                     attribute = exabgp_message['neighbor']['message']['update']['attribute']
 
-                    update_message.path_attributes.append(
-                        PathAttributes(
-                            origin=self._parse_origin(
-                                origin=attribute['origin'],
-                            ),
-                            as_path=self._parse_as_path(
-                                as_path=attribute.get('as-path'),
-                            ),
-                            next_hop=self._parse_next_hop(
-                                announce=announce,
-                            ),
-                            multi_exit_disc=attribute.get('med', 0),
-                            local_pref=attribute.get('local-preference', 100),
-                            atomic_aggregate=attribute.get('atomic-aggregate', False),
-                            aggregator=self._parse_aggregator(
-                                aggregator=attribute.get('aggregator'),
-                            ),
-                            community=attribute.get('community'),
-                            large_community=attribute.get('large-community'),
-                            extended_community=self._parse_extended_community(
-                                extended_community=attribute.get('extended-community'),
-                            ),
-                            orginator_id=attribute.get('originator-id'),
-                            cluster_list=attribute.get('cluster-list'),
-                            mp_reach_nlri=mp_reach_nlris,
-                            mp_unreach_nlri=[],
-                        )
+                    update_message.path_attributes = PathAttributes(
+                        origin=self._parse_origin(
+                            origin=attribute['origin'],
+                        ),
+                        as_path=self._parse_as_path(
+                            as_path=attribute.get('as-path'),
+                        ),
+                        next_hop=self._parse_next_hop(
+                            announce=announce,
+                        ),
+                        multi_exit_disc=attribute.get('med', 0),
+                        local_pref=attribute.get('local-preference', 100),
+                        atomic_aggregate=attribute.get('atomic-aggregate', False),
+                        aggregator=self._parse_aggregator(
+                            aggregator=attribute.get('aggregator'),
+                        ),
+                        community=attribute.get('community'),
+                        large_community=attribute.get('large-community'),
+                        extended_community=self._parse_extended_community(
+                            extended_community=attribute.get('extended-community'),
+                        ),
+                        orginator_id=attribute.get('originator-id'),
+                        cluster_list=attribute.get('cluster-list'),
+                        mp_reach_nlri=mp_reach_nlris,
+                        mp_unreach_nlri=[],
                     )
 
             self._send_message(update_message)
