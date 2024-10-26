@@ -27,7 +27,7 @@ class Network(BaseModel):
     mask: int
 
 class PathAttributes(BaseModel):
-    origin: OriginType
+    origin: Optional[OriginType] = None
     as_path: Optional[AsPath] = None
     next_hop: Optional[list[str]] = None
     multi_exit_disc: int = 0
@@ -49,4 +49,4 @@ class BGPUpdateMessage(BaseModel):
     peer_as: int = None
     local_as: int = None
     withdrawn_routes: list[Network] = []
-    path_attributes: list[PathAttributes] = []
+    path_attributes: Optional[PathAttributes] = None

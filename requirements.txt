@@ -1,4 +1,6 @@
+mrtparse
 pydantic
+exabgp
 click
 rich
 pika

@@ -1,12 +1,12 @@
 from src.parsers.update_message import BGPUpdateMessageParser
 from src.models.update_message import BGPUpdateMessage
-import pika
+import pika, os
 
 class RabbitMQAdapter:
     def __init__(self, parser: BGPUpdateMessageParser):
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host='localhost',
+                host=os.getenv('RABBIT_MQ_HOST', 'localhost'),
             )
         )
         channel = connection.channel()
