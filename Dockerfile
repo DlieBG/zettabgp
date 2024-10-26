@@ -6,9 +6,9 @@ COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
 COPY setup.py .
-COPY src/*.py src/
+COPY src/ src/
 
-RUN pip3 install .
+RUN pip3 install -e .
 
 ENV TZ=Europe/Berlin
 
