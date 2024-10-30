@@ -32,11 +32,11 @@ class Aggregator(BaseModel):
 
 class PathAttributes(BaseModel):
     origin: Optional[OriginType] = None
-    as_path: Optional[AsPath] = None
+    as_path: Optional[AsPath] = None # !
     next_hop: Optional[list[str]] = None
-    multi_exit_disc: int = 0
-    local_pref: int = 100
-    atomic_aggregate: bool = False
+    multi_exit_disc: Optional[int] = None
+    local_pref: Optional[int] = None
+    atomic_aggregate: Optional[bool] = None
     aggregator: Optional[Aggregator] = None
     community: Optional[list[list[int]]] = None
     large_community: Optional[list[list[int]]] = None
@@ -50,6 +50,6 @@ class RouteUpdate(BaseModel):
     local_ip: str
     peer_as: int
     local_as: int
-    change_type: ChangeType
-    nlri: NLRI
     path_attributes: PathAttributes
+    change_type: ChangeType = None
+    nlri: NLRI = None
