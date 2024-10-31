@@ -1,7 +1,8 @@
-from src.models.route_update import PathAttributes, RouteUpdate, OriginType, AsPathType, Aggregator, ChangeType, AsPath, NLRI
+from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, NLRI
 from src.parsers.route_update import RouteUpdateParser
 from datetime import datetime
-import itertools, json
+import json
+from rich import print
 
 class ExaBGPParser(RouteUpdateParser):
     def _parse_origin(self, origin: str) -> OriginType:
@@ -16,14 +17,14 @@ class ExaBGPParser(RouteUpdateParser):
             case 'incomplete':
                 return OriginType.INCOMPLETE
     
-    def _parse_as_path(self, as_path: list[int]) -> AsPath:
+    def _parse_as_sequence(self, as_path: list[int]) -> list[int]:
         if as_path is None:
             return None
 
-        return AsPath(
-            type=AsPathType.AS_SEQUENCE,
-            value=as_path,
-        )
+        if type(as_path) is list and all([type(entry) is int for entry in as_path]):
+            return as_path
+
+        return None
 
     def _parse_aggregator(self, aggregator: str) -> Aggregator:
         if aggregator is None:
@@ -49,9 +50,9 @@ class ExaBGPParser(RouteUpdateParser):
             origin=self._parse_origin(
                 origin=attribute.get('origin'),
             ),
-            # as_path=self._parse_as_path(
-            #     as_path=attribute.get('as-path'),
-            # ), # as-sequence!
+            as_sequence=self._parse_as_sequence(
+                as_path=attribute.get('as-path'),
+            ),
             next_hop=None if next_hop is None else [next_hop],
             multi_exit_disc=attribute.get('med'),
             local_pref=attribute.get('local-preference'),
