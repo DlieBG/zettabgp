@@ -1,4 +1,4 @@
-from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, NLRI
+from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, AsPathType, AsPath, NLRI
 from src.parsers.exabgp import ExaBGPParser
 from datetime import datetime
 import unittest
@@ -77,9 +77,14 @@ class ExaBGPParserTests(unittest.TestCase):
                     withdrawn_routes=[],
                     path_attributes=PathAttributes(
                         origin=OriginType.IGP,
-                        as_sequence=[
-                            12779,
-                            12654,
+                        as_path=[
+                            AsPath(
+                                type=AsPathType.AS_SEQUENCE,
+                                value=[
+                                    12779,
+                                    12654,
+                                ],
+                            ),
                         ],
                         next_hop=[
                             '2001:7f8::31eb:0:1',

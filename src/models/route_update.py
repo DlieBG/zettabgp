@@ -16,13 +16,23 @@ class OriginType(Enum):
     EGP = 2
     INCOMPLETE = 3
 
+class AsPathType(Enum):
+    AS_SET = 1
+    AS_SEQUENCE = 2
+    AS_CONFED_SET = 3
+    AS_CONFED_SEQUENCE = 4
+
+class AsPath(BaseModel):
+    type: AsPathType
+    value: list[int]
+
 class Aggregator(BaseModel):
     router_id: str
     router_as: int
 
 class PathAttributes(BaseModel):
     origin: Optional[OriginType] = None
-    as_sequence: Optional[list[int]] = None
+    as_path: Optional[list[AsPath]] = None
     next_hop: Optional[list[str]] = None
     multi_exit_disc: Optional[int] = None
     local_pref: Optional[int] = None
