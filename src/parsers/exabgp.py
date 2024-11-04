@@ -21,6 +21,8 @@ class ExaBGPParser(RouteUpdateParser):
         if as_path is None:
             return None
 
+        # According to the ExaBGP documentation, the as-path attribute contains only as-sequences.
+        # https://github.com/Exa-Networks/exabgp/wiki/Controlling-ExaBGP-:-API-for-received-messages#update-announcement-receive-routes
         return [
             AsPath(
                 type=AsPathType.AS_SEQUENCE,
@@ -55,6 +57,8 @@ class ExaBGPParser(RouteUpdateParser):
             as_path=self._parse_as_path(
                 as_path=attribute.get('as-path'),
             ),
+            # According to the ExaBGP documentation, the next-hop attribute is only one ip address.
+            # https://github.com/Exa-Networks/exabgp/wiki/Controlling-ExaBGP-:-API-for-received-messages#update-announcement-receive-routes
             next_hop=None if next_hop is None else [next_hop],
             multi_exit_disc=attribute.get('med'),
             local_pref=attribute.get('local-preference'),
