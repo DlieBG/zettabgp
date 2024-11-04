@@ -1,10 +1,9 @@
 from src.parsers.route_update import RouteUpdateParser
 from src.models.route_update import RouteUpdate
 from src.models.route_update import ChangeType
-from typing import Optional
 from bson.objectid import ObjectId
 from pymongo import MongoClient
-from enum import Enum
+from typing import Optional
 
 class MongoDBAdapter:
     '''This class is responsible for receiving the parsed messages and forwarding them to both MongoDB databases'''
@@ -177,4 +176,3 @@ class MongoDBAdapter:
                             }
                         }  
                         statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
-
