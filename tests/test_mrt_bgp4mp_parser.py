@@ -8,7 +8,8 @@ class MrtBgp4MpParserTests(unittest.TestCase):
     mrt_bgp4mp_parser = MrtBgp4MpParser()
     
     messages = [
-        copy.copy(message) for message in Reader('tests/20241005_1800_1728151200_bgp_lw_ixp_decix_update')
+        copy.copy(message)
+            for message in Reader('tests/mrt/20241005_1800_1728151200_bgp_lw_ixp_decix_update')
     ]
 
     def test_announce_1(self):
