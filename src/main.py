@@ -1,5 +1,6 @@
 from src.parsers.mrt_bgp4mp import MrtBgp4MpParser
 from src.adapters.rabbitmq import RabbitMQAdapter
+from src.adapters.mongodb import MongoDBAdapter
 from src.parsers.exabgp import ExaBGPParser
 from mrtparse import Reader
 import click, time, sys
@@ -28,7 +29,12 @@ def cli():
     '-s',
     is_flag=True,
 )
-def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool):
+@click.option(
+    '--no-mongodb-statistics',
+    '-t',
+    is_flag=True,
+)
+def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool):
     parser = ExaBGPParser()
 
     if not no_rabbitmq:
@@ -36,11 +42,13 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool):
             parser=parser,
         )
 
-    if not no_mongodb_log:
-        pass
-
-    if not no_mongodb_state:
-        pass
+    if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
+        MongoDBAdapter(
+            parser=parser,
+            no_mongodb_log=no_mongodb_log,
+            no_mongodb_state=no_mongodb_state,
+            no_mongodb_statistics=no_mongodb_statistics,
+        )
 
     while True:
         for line in sys.stdin:
@@ -69,6 +77,11 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool):
     '-s',
     is_flag=True,
 )
+@click.option(
+    '--no-mongodb-statistics',
+    '-t',
+    is_flag=True,
+)
 @click.argument(
     'mrt_file',
     type=click.Path(
@@ -76,7 +89,7 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool):
         resolve_path=True,
     ),
 )
-def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, mrt_file: str):
+def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, mrt_file: str):
     parser = MrtBgp4MpParser()
 
     if not no_rabbitmq:
@@ -84,11 +97,13 @@ def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bo
             parser=parser,
         )
 
-    if not no_mongodb_log:
-        pass
-
-    if not no_mongodb_state:
-        pass
+    if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
+        MongoDBAdapter(
+            parser=parser,
+            no_mongodb_log=no_mongodb_log,
+            no_mongodb_state=no_mongodb_state,
+            no_mongodb_statistics=no_mongodb_statistics,
+        )
 
     for message in Reader(mrt_file):
         if message.data['type'] != {16: 'BGP4MP'}:

@@ -4,3 +4,5 @@ exabgp
 click
 rich
 pika
+pymongo
+bson
