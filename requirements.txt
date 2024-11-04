@@ -3,6 +3,5 @@ pydantic
 pymongo
 exabgp
 click
-bson
 rich
 pika

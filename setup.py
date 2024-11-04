@@ -15,7 +15,6 @@ setup(
         'pymongo',
         'exabgp',
         'click',
-        'bson',
         'rich',
         'pika',
     ],
