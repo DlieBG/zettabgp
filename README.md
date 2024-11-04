@@ -52,10 +52,35 @@ MONGO_DB_HOST
 MONGO_DB_PORT
 ```
 
-## Expected Functionality
-### RabbitMQ Adapter
-The RabbitMQ Adapter handles incoming `announce` and `withdraw` messages and forwards them to the `zettabgp` exchange.\
-For testing purposes the queues `test_bgp_updates`, `test_bgp_announces` and `test_bgp_withdraws` are bind to the exchange.
+## Usage
+ZettaBGP provides a CLI interface with some commands for testbed simulations as well for production use.
+
+## Comands
+### `zettabgp exabgp`
+The `exabgp` subcommand is used for processing ExaBGP Messages.\
+The process can be started from within ExaBGP.\
+The Messages will be received using the stdin pipe.
+```
+Options:
+  -r, --no-rabbitmq
+  -l, --no-mongodb-log
+  -s, --no-mongodb-state
+  -t, --no-mongodb-statistics
+```
+
+### `zettabgp mrt-simulation`
+The `mrt-simulation` subcommand is used for processing MRT files.\
+It is mendatory to provide a valid path to a mrt file.\
+```
+Arguments:
+  MRT_FILE
+
+Options:
+  -r, --no-rabbitmq
+  -l, --no-mongodb-log
+  -s, --no-mongodb-state
+  -t, --no-mongodb-statistics
+```
 
 ## Debugging
 Some sample json messages for debugging purposes from ExaBGP can be found in the `samples` directory.
