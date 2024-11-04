@@ -12,8 +12,10 @@ setup(
     install_requires=[
         'mrtparse',
         'pydantic',
+        'pymongo',
         'exabgp',
         'click',
+        'bson',
         'rich',
         'pika',
     ],

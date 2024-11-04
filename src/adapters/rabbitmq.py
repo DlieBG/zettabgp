@@ -1,9 +1,9 @@
-from src.parsers.update_message import BGPUpdateMessageParser
-from src.models.update_message import BGPUpdateMessage
+from src.parsers.route_update import RouteUpdateParser
+from src.models.route_update import RouteUpdate
 import pika, os
 
 class RabbitMQAdapter:
-    def __init__(self, parser: BGPUpdateMessageParser):
+    def __init__(self, parser: RouteUpdateParser):
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=os.getenv('RABBIT_MQ_HOST', 'localhost'),
@@ -30,7 +30,7 @@ class RabbitMQAdapter:
         )
 
         @parser.on_update
-        def on_update(message: BGPUpdateMessage):
+        def on_update(message: RouteUpdate):
             channel.basic_publish(
                 exchange='zettabgp',
                 body=message.model_dump_json(),

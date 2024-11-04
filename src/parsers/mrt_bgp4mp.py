@@ -1,16 +1,16 @@
-from src.models.update_message import BGPUpdateMessage, PathAttributes, OriginType, AsPathType, Aggregator, Network, AsPath
-from src.parsers.update_message import BGPUpdateMessageParser
+from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, AsPathType, AsPath, NLRI
+from src.parsers.route_update import RouteUpdateParser
 from collections import OrderedDict
 from datetime import datetime
 from mrtparse import Bgp4Mp
 
-class MrtBgp4MpParser(BGPUpdateMessageParser):
-    def _parse_network(self, network: OrderedDict) -> Network:
-        network = dict(network)
+class MrtBgp4MpParser(RouteUpdateParser):
+    def _parse_nlri(self, nlri: OrderedDict) -> NLRI:
+        nlri = dict(nlri)
         
-        return Network(
-            prefix=network['prefix'],
-            mask=network['length'],
+        return NLRI(
+            prefix=nlri['prefix'],
+            length=nlri['length'],
         )
     
     def _get_path_attribute(self, path_attributes: OrderedDict, type: dict) -> dict:
@@ -37,18 +37,16 @@ class MrtBgp4MpParser(BGPUpdateMessageParser):
             case 'INCOMPLETE':
                 return OriginType.INCOMPLETE
 
-    def _parse_as_path(self, path_attributes: list[OrderedDict]) -> AsPath:
-        as_path = self._get_path_attribute(
+    def _parse_as_path(self, path_attributes: list[OrderedDict]) -> list[AsPath]:
+        as_paths = self._get_path_attribute(
             path_attributes=path_attributes,
             type={2: 'AS_PATH'},
         )
 
-        if as_path is None:
+        if as_paths is None:
             return None
 
-        as_path = dict(as_path['value'][0])
-
-        def _type() -> AsPathType:
+        def _as_path_type(as_path: dict) -> AsPathType:
             match list(as_path['type'].values())[0]:
                 case 'AS_SET':
                     return AsPathType.AS_SET
@@ -59,13 +57,16 @@ class MrtBgp4MpParser(BGPUpdateMessageParser):
                 case 'AS_CONFED_SEQUENCE':
                     return AsPathType.AS_CONFED_SEQUENCE
 
-        return AsPath(
-            type=_type(),
-            value=[
-                int(value) 
-                    for value in as_path['value']
-            ],
-        )
+        return [
+            AsPath(
+                type=_as_path_type(dict(as_path)),
+                value=[
+                    int(value) 
+                        for value in dict(as_path)['value']
+                ],
+            )
+                for as_path in as_paths['value']
+        ]
 
     def _parse_next_hop(self, path_attributes: list[OrderedDict]) -> list[str]:
         next_hop = self._get_path_attribute(
@@ -170,33 +171,56 @@ class MrtBgp4MpParser(BGPUpdateMessageParser):
 
         return extended_community['value']
 
-    def _parse_mp_reach_nlri(self, nested_bgp4mp_message: dict) -> list[Network]:
-        if len(nested_bgp4mp_message['nlri']) > 0:
-            return [
-                self._parse_network(
-                    network=nlri,
-                )
-                    for nlri in nested_bgp4mp_message['nlri']
-            ]
+    def _parse_path_attributes(self, path_attributes: list[dict]) -> PathAttributes:
+        return PathAttributes(
+            origin=self._parse_origin(
+                path_attributes=path_attributes,
+            ),
+            as_path=self._parse_as_path(
+                path_attributes=path_attributes,
+            ),
+            next_hop=self._parse_next_hop(
+                path_attributes=path_attributes,
+            ),
+            multi_exit_disc=self._parse_multi_exit_disc(
+                path_attributes=path_attributes,
+            ),
+            atomic_aggregate=self._parse_atomic_aggregate(
+                path_attributes=path_attributes,
+            ),
+            aggregator=self._parse_aggregator(
+                path_attributes=path_attributes,
+            ),
+            community=self._parse_community(
+                path_attributes=path_attributes,
+            ),
+            large_community=self._parse_large_community(
+                path_attributes=path_attributes,
+            ),
+            extended_community=self._parse_extended_community(
+                path_attributes=path_attributes,
+            ),
+        )
 
+    def _parse_mp_reach_nlri(self, path_attributes: list[OrderedDict]) -> list[NLRI]:
         mp_reach_nlri = self._get_path_attribute(
-            path_attributes=nested_bgp4mp_message['path_attributes'],
+            path_attributes=path_attributes,
             type={14: 'MP_REACH_NLRI'},
         )
 
-        if mp_reach_nlri:
-            mp_reach_nlri = dict(mp_reach_nlri['value'])
+        if mp_reach_nlri is None:
+            return []
+        
+        mp_reach_nlri = dict(mp_reach_nlri['value'])
 
-            return [
-                self._parse_network(
-                    network=nlri,
-                )
-                    for nlri in mp_reach_nlri['nlri']
-            ]
+        return [
+            self._parse_nlri(
+                nlri=nlri,
+            )
+                for nlri in mp_reach_nlri['nlri']
+        ]
 
-        return []
-
-    def _parse_mp_unreach_nlri(self, path_attributes: list[OrderedDict]) -> list[Network]:
+    def _parse_mp_unreach_nlri(self, path_attributes: list[OrderedDict]) -> list[NLRI]:
         mp_unreach_nlri = self._get_path_attribute(
             path_attributes=path_attributes,
             type={15: 'MP_UNREACH_NLRI'},
@@ -208,15 +232,22 @@ class MrtBgp4MpParser(BGPUpdateMessageParser):
         mp_unreach_nlri = dict(mp_unreach_nlri['value'])
 
         return [
-            self._parse_network(
-                network=withdrawn_route,
+            self._parse_nlri(
+                nlri=withdrawn_route,
             )
                 for withdrawn_route in mp_unreach_nlri['withdrawn_routes']
         ]
 
-    def parse(self, bgp4mp_message: Bgp4Mp) -> BGPUpdateMessage:
+    def parse(self, bgp4mp_message: Bgp4Mp) -> list[RouteUpdate]:
+        route_updates: list[RouteUpdate] = []
+
         bgp4mp_message = dict(bgp4mp_message.data)
-        update_message = BGPUpdateMessage(
+        nested_bgp4mp_message = dict(bgp4mp_message['bgp_message'])
+        
+        if nested_bgp4mp_message['type'].get(2) != 'UPDATE':
+            return None
+        
+        generic_update = RouteUpdate(
             timestamp=datetime.fromtimestamp(
                 timestamp=list(bgp4mp_message['timestamp'].keys())[0],
             ),
@@ -224,56 +255,40 @@ class MrtBgp4MpParser(BGPUpdateMessageParser):
             local_ip=bgp4mp_message['local_ip'],
             peer_as=int(bgp4mp_message['peer_as']),
             local_as=int(bgp4mp_message['local_as']),
+            path_attributes=self._parse_path_attributes(
+                path_attributes=nested_bgp4mp_message.get('path_attributes', []),
+            ),
         )
 
-        nested_bgp4mp_message = dict(bgp4mp_message['bgp_message'])
-
-        if nested_bgp4mp_message['type'].get(2) == 'UPDATE':
-            # withdrawn routes
-            update_message.withdrawn_routes = [
-                self._parse_network(
-                    network=withdrawn_route,
+        # withdrawn routes
+        for withdraw_route in nested_bgp4mp_message.get('withdrawn_routes', []) + self._parse_mp_unreach_nlri(
+            path_attributes=nested_bgp4mp_message.get('path_attributes', []),
+        ):
+            route_updates.append(
+                generic_update.model_copy(
+                    update={
+                        'change_type': ChangeType.WITHDRAW,
+                        'nlri': self._parse_nlri(
+                            nlri=withdraw_route,
+                        ),
+                    }
                 )
-                    for withdrawn_route in nested_bgp4mp_message['withdrawn_routes']
-            ]
+            )
 
-            # path attributes
-            if len(nested_bgp4mp_message['path_attributes']) > 0:
-                update_message.path_attributes = PathAttributes(
-                    origin=self._parse_origin(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    as_path=self._parse_as_path(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    next_hop=self._parse_next_hop(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    multi_exit_disc=self._parse_multi_exit_disc(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    atomic_aggregate=self._parse_atomic_aggregate(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    aggregator=self._parse_aggregator(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    community=self._parse_community(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    large_community=self._parse_large_community(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    extended_community=self._parse_extended_community(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
-                    mp_reach_nlri=self._parse_mp_reach_nlri(
-                        nested_bgp4mp_message=nested_bgp4mp_message,
-                    ),
-                    mp_unreach_nlri=self._parse_mp_unreach_nlri(
-                        path_attributes=nested_bgp4mp_message['path_attributes'],
-                    ),
+        # announce routes
+        for announce_route in nested_bgp4mp_message.get('nlri', []) + self._parse_mp_reach_nlri(
+            path_attributes=nested_bgp4mp_message.get('path_attributes', []),
+        ):
+            route_updates.append(
+                generic_update.model_copy(
+                    update={
+                        'change_type': ChangeType.ANNOUNCE,
+                        'nlri': self._parse_nlri(
+                            nlri=announce_route,
+                        ),
+                    }
                 )
+            )
 
-        self._send_message(update_message)
-        return update_message
+        self._send_messages(route_updates)
+        return route_updates
