@@ -44,6 +44,14 @@ sudo docker compose up -d
 ```
 The data will be stored in the `data` directory.
 
+### Environment Variables
+The following environment variables can be used to specify connection parameters.
+```
+RABBIT_MQ_HOST
+MONGO_DB_HOST
+MONGO_DB_PORT
+```
+
 ## Expected Functionality
 ### RabbitMQ Adapter
 The RabbitMQ Adapter handles incoming `announce` and `withdraw` messages and forwards them to the `zettabgp` exchange.\

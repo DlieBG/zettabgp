@@ -4,13 +4,17 @@ from src.models.route_update import ChangeType
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 from typing import Optional
+import os
 
 class MongoDBAdapter:
     '''This class is responsible for receiving the parsed messages and forwarding them to both MongoDB databases'''
     def __init__(self, parser: RouteUpdateParser, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool):
         try:
             '''Connects to MongoDB-Container running with Docker'''
-            database_client = MongoClient('localhost', 27017)
+            database_client = MongoClient(
+                host=os.getenv('MONGO_DB_HOST', 'localhost'),
+                port=int(os.getenv('MONGO_DB_PORT', 27017)),
+            )
         except:
             print('Could not connect to the database')
 
