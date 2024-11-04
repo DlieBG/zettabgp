@@ -1,9 +1,9 @@
 from src.parsers.route_update import RouteUpdateParser
 from src.models.route_update import RouteUpdate
 from src.models.route_update import ChangeType
-from bson.objectid import ObjectId
 from pymongo import MongoClient
 from typing import Optional
+from bson import ObjectId
 import os
 
 class MongoDBAdapter:

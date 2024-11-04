@@ -55,8 +55,8 @@ MONGO_DB_PORT
 ## Usage
 ZettaBGP provides a CLI interface with some commands for testbed simulations as well for production use.
 
-## Comands
-### `zettabgp exabgp`
+### Comands
+#### `zettabgp exabgp`
 The `exabgp` subcommand is used for processing ExaBGP Messages.\
 The process can be started from within ExaBGP.\
 The Messages will be received using the stdin pipe.
@@ -68,7 +68,7 @@ Options:
   -t, --no-mongodb-statistics
 ```
 
-### `zettabgp mrt-simulation`
+#### `zettabgp mrt-simulation`
 The `mrt-simulation` subcommand is used for processing MRT files.\
 It is mendatory to provide a valid path to a mrt file.\
 ```
@@ -89,4 +89,58 @@ Some sample json messages for debugging purposes from ExaBGP can be found in the
 When you want to access the MongoDB and RabbitMQ instances on the testbed, you can use a remote port forward with ssh to forward the application ports to your local machine.
 ```
 ssh -L 15672:127.0.0.1:15672 -L 5672:127.0.0.1:5672 -L 27017:127.0.0.1:27017 node103
+```
+
+## Models
+```python
+class ChangeType(Enum):
+    ANNOUNCE = 1,
+    WITHDRAW = 2,
+
+class NLRI(BaseModel):
+    prefix: str
+    length: int
+
+class OriginType(Enum):
+    IGP = 1
+    EGP = 2
+    INCOMPLETE = 3
+
+class AsPathType(Enum):
+    AS_SET = 1
+    AS_SEQUENCE = 2
+    AS_CONFED_SET = 3
+    AS_CONFED_SEQUENCE = 4
+
+class AsPath(BaseModel):
+    type: AsPathType
+    value: list[int]
+
+class Aggregator(BaseModel):
+    router_id: str
+    router_as: int
+
+class PathAttributes(BaseModel):
+    origin: Optional[OriginType] = None
+    as_path: Optional[list[AsPath]] = None
+    next_hop: Optional[list[str]] = None
+    multi_exit_disc: Optional[int] = None
+    local_pref: Optional[int] = None
+    atomic_aggregate: Optional[bool] = None
+    aggregator: Optional[Aggregator] = None
+    community: Optional[list[list[int]]] = None
+    large_community: Optional[list[list[int]]] = None
+    extended_community: Optional[list[int]] = None
+    orginator_id: Optional[str] = None
+    cluster_list: Optional[list[str]] = None
+
+class RouteUpdate(BaseModel):
+    timestamp: datetime = datetime.now()
+    peer_ip: str
+    local_ip: str
+    peer_as: int
+    local_as: int
+    path_attributes: PathAttributes
+    change_type: ChangeType = None
+    nlri: NLRI = None
 ```
