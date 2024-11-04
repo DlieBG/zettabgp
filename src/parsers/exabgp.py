@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 
 class ExaBGPParser(RouteUpdateParser):
+    '''This class is responsible for parsing ExaBGP messages'''
     def _parse_origin(self, origin: str) -> OriginType:
         if origin is None:
             return None
@@ -91,7 +92,7 @@ class ExaBGPParser(RouteUpdateParser):
             ),
         )
 
-        # withdrawn routes
+        '''Iterate over the withdraw routes and create RouteUpdate objects'''
         for withdraw_routes in exabgp_message['neighbor']['message']['update'].get('withdraw', {}).values():
             for withdraw_route in withdraw_routes:
                 withdraw_message = generic_update
@@ -104,7 +105,7 @@ class ExaBGPParser(RouteUpdateParser):
 
                 route_updates.append(withdraw_message)
 
-        # announce routes
+        '''Iterate over the announce routes and create RouteUpdate objects'''
         for announce_hops in exabgp_message['neighbor']['message']['update'].get('announce', {}).values():
             for announce_hop, announce_routes in announce_hops.items():
                 for announce_route in announce_routes:

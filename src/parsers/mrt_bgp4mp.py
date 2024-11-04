@@ -5,6 +5,7 @@ from datetime import datetime
 from mrtparse import Bgp4Mp
 
 class MrtBgp4MpParser(RouteUpdateParser):
+    '''This class is responsible for parsing MRT BGP4MP messages'''
     def _parse_nlri(self, nlri: OrderedDict) -> NLRI:
         nlri = dict(nlri)
         
@@ -260,7 +261,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
             ),
         )
 
-        # withdrawn routes
+        '''Iterate over the withdraw routes and create RouteUpdate objects'''
         for withdraw_route in nested_bgp4mp_message.get('withdrawn_routes', []) + self._parse_mp_unreach_nlri(
             path_attributes=nested_bgp4mp_message.get('path_attributes', []),
         ):
@@ -275,7 +276,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
                 )
             )
 
-        # announce routes
+        '''Iterate over the announce routes and create RouteUpdate objects'''
         for announce_route in nested_bgp4mp_message.get('nlri', []) + self._parse_mp_reach_nlri(
             path_attributes=nested_bgp4mp_message.get('path_attributes', []),
         ):

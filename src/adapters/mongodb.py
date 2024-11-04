@@ -43,7 +43,7 @@ class MongoDBAdapter:
             if message.path_attributes.origin:
                 origins = message.path_attributes.origin.value
             else:
-                 origins = None
+                origins = None
             
             as_paths: Optional[list[int, list[int]]] = None
             if message.path_attributes.as_path:
