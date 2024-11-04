@@ -272,7 +272,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
                         'nlri': self._parse_nlri(
                             nlri=withdraw_route,
                         ),
-                    }
+                    },
                 )
             )
 
@@ -287,7 +287,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
                         'nlri': self._parse_nlri(
                             nlri=announce_route,
                         ),
-                    }
+                    },
                 )
             )
 

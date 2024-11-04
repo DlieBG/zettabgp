@@ -99,33 +99,37 @@ class ExaBGPParser(RouteUpdateParser):
         '''Iterate over the withdraw routes and create RouteUpdate objects'''
         for withdraw_routes in exabgp_message['neighbor']['message']['update'].get('withdraw', {}).values():
             for withdraw_route in withdraw_routes:
-                withdraw_message = generic_update
-
-                withdraw_message.change_type = ChangeType.WITHDRAW
-                withdraw_message.nlri = NLRI(
-                        prefix=withdraw_route['nlri'].split('/')[0],
-                        length=int(withdraw_route['nlri'].split('/')[1]),
+                route_updates.append(
+                    generic_update.model_copy(
+                        update={
+                            'change_type': ChangeType.WITHDRAW,
+                            'nlri': NLRI(
+                                prefix=withdraw_route['nlri'].split('/')[0],
+                                length=int(withdraw_route['nlri'].split('/')[1]),
+                            ),
+                        },
+                    )
                 )
-
-                route_updates.append(withdraw_message)
 
         '''Iterate over the announce routes and create RouteUpdate objects'''
         for announce_hops in exabgp_message['neighbor']['message']['update'].get('announce', {}).values():
             for announce_hop, announce_routes in announce_hops.items():
                 for announce_route in announce_routes:
-                    announce_message = generic_update
-
-                    announce_message.path_attributes = self._parse_path_attributes(
-                        exabgp_message=exabgp_message,
-                        next_hop=announce_hop,
+                    route_updates.append(
+                        generic_update.model_copy(
+                            update={
+                                'path_attributes': self._parse_path_attributes(
+                                    exabgp_message=exabgp_message,
+                                    next_hop=announce_hop,
+                                ),
+                                'change_type': ChangeType.ANNOUNCE,
+                                'nlri': NLRI(
+                                    prefix=announce_route['nlri'].split('/')[0],
+                                    length=int(announce_route['nlri'].split('/')[1]),
+                                ),
+                            },
+                        )
                     )
-                    announce_message.change_type = ChangeType.ANNOUNCE
-                    announce_message.nlri = NLRI(
-                        prefix=announce_route['nlri'].split('/')[0],
-                        length=int(announce_route['nlri'].split('/')[1]),
-                    )
-
-                    route_updates.append(announce_message)
 
         self._send_messages(route_updates)
         return route_updates
