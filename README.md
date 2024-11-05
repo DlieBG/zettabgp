@@ -80,7 +80,36 @@ Options:
   -l, --no-mongodb-log
   -s, --no-mongodb-state
   -t, --no-mongodb-statistics
+  -p, --playback-speed INTEGER    Playback speed in multiples of real time. [default: (1)]
+  -o, --playback-interval INTEGER Playback interval in minutes.  [default: (5)]
 ```
+
+##### Playback Speed
+Without specifying a playback speed, `mrt-simulation` will replay all route updates at once.\
+When defining playback speed, the replay of the updates will be done in multiples of real time.\
+For a real time playback, you can use option `-p` without an argument.
+```
+zettabgp mrt-simulation <mrt-file> -p
+```
+For a playback speed that is twice as fast as real time, the option `-p` can be used with argument `2` (2x speed of real time).
+```
+zettabgp mrt-simulation <mrt-file> -p 2
+```
+
+##### Playback Interval
+For debugging the timebased group update queue, it is very useful to playback all update messages that occur within an interval of for example 5 minutes.\
+When you specify option `-o` you can set a playback interval in minutes that defaults to 5 minutes.\
+Between the intervals you have to press enter to continue with the replay of the next interval.\
+Of course you can combine this option with the playback speed option.\
+An 5 minute interval playback looks like that.
+```
+zettabgp mrt-simulation <mrt-file> -o
+```
+A 10 minute interval playback looks like that.
+```
+zettabgp mrt-simulation <mrt-file> -o 10
+```
+Please keep in mind that most of the mrt files only contain a timeslot of 15 minutes.
 
 ## Debugging
 Some sample json messages for debugging purposes from ExaBGP can be found in the `samples` directory.
