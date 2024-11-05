@@ -2,6 +2,7 @@ from src.parsers.mrt_bgp4mp import MrtBgp4MpParser
 from src.adapters.rabbitmq import RabbitMQAdapter
 from src.adapters.mongodb import MongoDBAdapter
 from src.parsers.exabgp import ExaBGPParser
+from datetime import datetime
 from mrtparse import Reader
 import click, time, sys
 from rich import print
@@ -82,6 +83,16 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_m
     '-t',
     is_flag=True,
 )
+@click.option(
+    '--playback-speed',
+    '-p',
+    type=int,
+    default=None,
+    show_default=True,
+    is_flag=False,
+    flag_value=1,
+    help='Playback speed in multiples of real time.',
+)
 @click.argument(
     'mrt_file',
     type=click.Path(
@@ -89,7 +100,7 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_m
         resolve_path=True,
     ),
 )
-def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, mrt_file: str):
+def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, playback_speed: int, mrt_file: str):
     parser = MrtBgp4MpParser()
 
     if not no_rabbitmq:
@@ -105,11 +116,23 @@ def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bo
             no_mongodb_statistics=no_mongodb_statistics,
         )
 
+    playback_reference: datetime = None
+
     for message in Reader(mrt_file):
         if message.data['type'] != {16: 'BGP4MP'}:
             print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
             print(message.data['type'])
             continue
+
+        if playback_speed:
+            current_timestamp: datetime = datetime.fromtimestamp(
+                timestamp=list(message.data['timestamp'].keys())[0],
+            )
+
+            if playback_reference:
+                time.sleep((current_timestamp - playback_reference).seconds / playback_speed)
+
+            playback_reference = current_timestamp
 
         parser.parse(
             bgp4mp_message=message,
