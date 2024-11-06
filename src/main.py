@@ -45,7 +45,12 @@ def cli():
     '-t',
     is_flag=True,
 )
-def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool):
+@click.option(
+    '--clear-mongodb',
+    '-c',
+    is_flag=True,
+)
+def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool):
     parser = ExaBGPParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
@@ -61,6 +66,7 @@ def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool
             no_mongodb_log=no_mongodb_log,
             no_mongodb_state=no_mongodb_state,
             no_mongodb_statistics=no_mongodb_statistics,
+            clear_mongodb=clear_mongodb,
         )
 
     while True:
@@ -106,6 +112,11 @@ def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool
     is_flag=True,
 )
 @click.option(
+    '--clear-mongodb',
+    '-c',
+    is_flag=True,
+)
+@click.option(
     '--playback-speed',
     '-p',
     type=int,
@@ -132,7 +143,7 @@ def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool
         resolve_path=True,
     ),
 )
-def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, playback_speed: int, playback_interval: int, mrt_file: str):
+def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, mrt_file: str):
     parser = MrtBgp4MpParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
@@ -148,6 +159,7 @@ def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_l
             no_mongodb_log=no_mongodb_log,
             no_mongodb_state=no_mongodb_state,
             no_mongodb_statistics=no_mongodb_statistics,
+            clear_mongodb=clear_mongodb,
         )
 
     playback_speed_reference: datetime = None

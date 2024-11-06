@@ -8,7 +8,7 @@ import os
 
 class MongoDBAdapter:
     '''This class is responsible for receiving the parsed messages and forwarding them to both MongoDB databases'''
-    def __init__(self, parser: RouteUpdateParser, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool):
+    def __init__(self, parser: RouteUpdateParser, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool):
         try:
             '''Connects to MongoDB-Container running with Docker'''
             database_client = MongoClient(
@@ -25,20 +25,22 @@ class MongoDBAdapter:
         if not log_flag:
             log_db = database_client.message_log
             log_collection = log_db.storage
-            log_collection.delete_many({})
+            if clear_mongodb:
+                log_collection.delete_many({})
         
         '''Creates database and collection for state storrage'''
         if not state_flag:
             state_db = database_client.message_state
             state_collection = state_db.storage
-            state_collection.delete_many({})
+            if clear_mongodb:
+                state_collection.delete_many({})
 
         '''Creates database and collection for statistics storrage'''
         if not statistics_flag:
             statistics_db = database_client.message_statistics
             statistics_collection = statistics_db.storage
-            statistics_collection.delete_many({})
-
+            if clear_mongodb:
+                statistics_collection.delete_many({})
 
         @parser.on_update
         def on_update(message: RouteUpdate):

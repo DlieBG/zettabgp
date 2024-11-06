@@ -19,7 +19,6 @@ class RabbitMQAdapter:
             exchange_type='direct',
         )
 
-
         '''Declares the test_bgp_updates queue and binds it to the zettabgp exchange'''
         def _declare_test_queue(queue_name: str, routing_key: str):
             channel.queue_declare(
