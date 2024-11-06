@@ -62,11 +62,23 @@ The process can be started from within ExaBGP.\
 The Messages will be received using the stdin pipe.
 ```
 Options:
-  -r, --no-rabbitmq
+  -d, --no-rabbitmq-direct
+  -g, --rabbitmq-grouped INTEGER  Queue group interval in minutes. [default: (5)]
   -l, --no-mongodb-log
   -s, --no-mongodb-state
   -t, --no-mongodb-statistics
 ```
+
+##### Queue Group Interval
+Besides the direct RabbitMQ queue (Exchange: `zettabgp` with Routing Key: `direct`), a grouped queue can be activated.\
+The grouped queue (Exchange: `zettabgp` with Routing Key: `grouped`) will be filled white grouped route updates when enabled with the `-g` option.\
+The group interval defaults to 5 minutes.\
+Alternative intervals can be set as an argument to option `-g`.\
+A 10 minute interval can be set as following.
+```
+zettabgp exabgp -g 10
+```
+When no `-g` option is present, no grouped updates will appear at all.
 
 #### `zettabgp mrt-simulation`
 The `mrt-simulation` subcommand is used for processing MRT files.\
@@ -76,13 +88,17 @@ Arguments:
   MRT_FILE
 
 Options:
-  -r, --no-rabbitmq
+  -d, --no-rabbitmq-direct
+  -g, --rabbitmq-grouped INTEGER  Queue group interval in minutes. [default: (5)]
   -l, --no-mongodb-log
   -s, --no-mongodb-state
   -t, --no-mongodb-statistics
   -p, --playback-speed INTEGER    Playback speed in multiples of real time. [default: (1)]
-  -o, --playback-interval INTEGER Playback interval in minutes.  [default: (5)]
+  -o, --playback-interval INTEGER Playback interval in minutes. [default: (5)]  
 ```
+
+##### Queue Group Interval
+See [`exabgp` command reference](#queue-group-interval).
 
 ##### Playback Speed
 Without specifying a playback speed, `mrt-simulation` will replay all route updates at once.\
