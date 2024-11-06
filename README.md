@@ -67,6 +67,7 @@ Options:
   -l, --no-mongodb-log
   -s, --no-mongodb-state
   -t, --no-mongodb-statistics
+  -c, --clear-mongodb
 ```
 
 ##### Queue Group Interval
@@ -93,6 +94,7 @@ Options:
   -l, --no-mongodb-log
   -s, --no-mongodb-state
   -t, --no-mongodb-statistics
+  -c, --clear-mongodb
   -p, --playback-speed INTEGER    Playback speed in multiples of real time. [default: (1)]
   -o, --playback-interval INTEGER Playback interval in minutes. [default: (5)]  
 ```
