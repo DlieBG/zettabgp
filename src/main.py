@@ -16,9 +16,19 @@ def cli():
     help='Process ExaBGP messages.',
 )
 @click.option(
-    '--no-rabbitmq',
-    '-r',
+    '--no-rabbitmq-direct',
+    '-d',
     is_flag=True,
+)
+@click.option(
+    '--rabbitmq-grouped',
+    '-g',
+    type=int,
+    default=None,
+    show_default='5',
+    is_flag=False,
+    flag_value=5,
+    help='Queue group interval in minutes.',
 )
 @click.option(
     '--no-mongodb-log',
@@ -35,12 +45,14 @@ def cli():
     '-t',
     is_flag=True,
 )
-def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool):
+def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool):
     parser = ExaBGPParser()
 
-    if not no_rabbitmq:
+    if not no_rabbitmq_direct or rabbitmq_grouped:
         RabbitMQAdapter(
             parser=parser,
+            no_direct=no_rabbitmq_direct,
+            queue_interval=rabbitmq_grouped,
         )
 
     if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
@@ -64,9 +76,19 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_m
     help='Process BGP4MP MRT files.',
 )
 @click.option(
-    '--no-rabbitmq',
-    '-r',
+    '--no-rabbitmq-direct',
+    '-d',
     is_flag=True,
+)
+@click.option(
+    '--rabbitmq-grouped',
+    '-g',
+    type=int,
+    default=None,
+    show_default='5',
+    is_flag=False,
+    flag_value=5,
+    help='Queue group interval in minutes.',
 )
 @click.option(
     '--no-mongodb-log',
@@ -110,12 +132,14 @@ def exabgp(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_m
         resolve_path=True,
     ),
 )
-def mrt_simulation(no_rabbitmq: bool, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, playback_speed: int, playback_interval: int, mrt_file: str):
+def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, playback_speed: int, playback_interval: int, mrt_file: str):
     parser = MrtBgp4MpParser()
 
-    if not no_rabbitmq:
+    if not no_rabbitmq_direct or rabbitmq_grouped:
         RabbitMQAdapter(
             parser=parser,
+            no_direct=no_rabbitmq_direct,
+            queue_interval=rabbitmq_grouped,
         )
 
     if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
