@@ -12,7 +12,9 @@ Author:
 '''
 import src.services.mrt_simulation as mrt_simulation_service
 import src.services.exabgp as exabgp_service
+from src.adapters.mongodb import RibImport
 from src.webapp import start_webapp
+from mrtparse import Reader
 import click
 
 @click.group()
@@ -204,3 +206,25 @@ def webapp(reload: bool):
     start_webapp(
         reload=reload,
     )
+
+@cli.command(
+    name='rib-load',
+    help='Load a rib-file in ZettaBGP.',
+)
+@click.argument(
+    'rib_file',
+    type=click.Path(
+        exists=True,
+        resolve_path=True,
+    ),
+)
+@click.option(
+    '--clear-mongodb',
+    '-c',
+    is_flag=True,
+)
+def rib_load(clear_mongodb: bool, rib_file: str):
+    '''Imports a rib-file at given path in mongodb'''
+    RibImport(clear_mongodb)
+    for message in Reader(rib_file):
+        RibImport.write_rib(RibImport, message.data)

@@ -13,10 +13,11 @@ Author:
 from src.parsers.route_update import RouteUpdateParser
 from src.models.route_update import RouteUpdate
 from src.models.route_update import ChangeType
+from collections import OrderedDict
 from pymongo import MongoClient
 from typing import Optional
 from bson import ObjectId
-import os
+import json, os
 
 class MongoDBAdapter:
     '''
@@ -222,3 +223,19 @@ class MongoDBAdapter:
                             }
                         }  
                         statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
+
+class RibImport:
+    '''This class imports a rib-file in mongodb'''
+    database_client = MongoClient(
+    host=os.getenv('MONGO_DB_HOST', 'localhost'),
+    port=int(os.getenv('MONGO_DB_PORT', 27017)),
+    )
+    rib_db = database_client.rib_load
+    rib_collection = rib_db.storage
+    def __init__(self, clear_mongodb: bool):
+        if clear_mongodb:
+            self.rib_collection.delete_many({})
+
+    def write_rib(self, statement: OrderedDict):
+        rib_announce = self.rib_collection.insert_one(json.loads(json.dumps(statement)))
+        
