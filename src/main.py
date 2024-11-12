@@ -137,13 +137,15 @@ def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool
     help='Playback interval in minutes.',
 )
 @click.argument(
-    'mrt_file',
+    'mrt_files',
     type=click.Path(
         exists=True,
         resolve_path=True,
     ),
+    required=True,
+    nargs=-1,
 )
-def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, mrt_file: str):
+def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, mrt_files: tuple[str]):
     parser = MrtBgp4MpParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
@@ -165,30 +167,31 @@ def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_l
     playback_speed_reference: datetime = None
     playback_interval_stop: datetime = None
 
-    for message in Reader(mrt_file):
-        if message.data['type'] != {16: 'BGP4MP'}:
-            print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
-            print(message.data['type'])
-            continue
+    for mrt_file in mrt_files:
+        for message in Reader(mrt_file):
+            if message.data['type'] != {16: 'BGP4MP'}:
+                print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
+                print(message.data['type'])
+                continue
 
-        current_timestamp: datetime = datetime.fromtimestamp(
-            timestamp=list(message.data['timestamp'].keys())[0],
-        )
+            current_timestamp: datetime = datetime.fromtimestamp(
+                timestamp=list(message.data['timestamp'].keys())[0],
+            )
 
-        if playback_speed:
-            if playback_speed_reference:
-                time.sleep((current_timestamp - playback_speed_reference).seconds / playback_speed)
+            if playback_speed:
+                if playback_speed_reference:
+                    time.sleep((current_timestamp - playback_speed_reference).seconds / playback_speed)
 
-            playback_speed_reference = current_timestamp
+                playback_speed_reference = current_timestamp
 
-        if playback_interval:
-            if playback_interval_stop:
-                if current_timestamp > playback_interval_stop:
-                    input('Enter for next interval...')
-                    playback_interval_stop = playback_interval_stop + timedelta(minutes=playback_interval)
-            else:
-                playback_interval_stop = current_timestamp + timedelta(minutes=playback_interval)
+            if playback_interval:
+                if playback_interval_stop:
+                    if current_timestamp > playback_interval_stop:
+                        input('Enter for next interval...')
+                        playback_interval_stop = playback_interval_stop + timedelta(minutes=playback_interval)
+                else:
+                    playback_interval_stop = current_timestamp + timedelta(minutes=playback_interval)
 
-        parser.parse(
-            bgp4mp_message=message,
-        )
+            parser.parse(
+                bgp4mp_message=message,
+            )
