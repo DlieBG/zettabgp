@@ -82,11 +82,14 @@ zettabgp exabgp -g 10
 When no `-g` option is present, no grouped updates will appear at all.
 
 #### `zettabgp mrt-simulation`
-The `mrt-simulation` subcommand is used for processing MRT files.\
-It is mendatory to provide a valid path to a mrt file.\
+The `mrt-simulation` subcommand is used for processing mrt files.\
+It is mendatory to provide a valid path to at least one mrt file.\
+`mrt-simulation` also supports the handling of multiple mrt files.\
+But keep in mind to provide sequentially sorted mrt files based on the timeframe.\
+Otherwise the grouping feature will not work properly!
 ```
 Arguments:
-  MRT_FILE
+  MRT_FILES...
 
 Options:
   -d, --no-rabbitmq-direct
