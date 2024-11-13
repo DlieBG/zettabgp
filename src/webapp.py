@@ -1,4 +1,4 @@
-from src.controllers.test import test_router
+from src.controllers.version import version_router
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi import FastAPI
@@ -7,8 +7,8 @@ import uvicorn
 app = FastAPI()
 
 app.include_router(
-    router=test_router,
-    prefix='/api/test'
+    router=version_router,
+    prefix='/api/version'
 )
 
 app.mount(
