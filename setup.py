@@ -13,6 +13,8 @@ setup(
         'mrtparse',
         'pydantic',
         'pymongo',
+        'uvicorn',
+        'fastapi',
         'exabgp',
         'click',
         'rich',

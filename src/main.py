@@ -3,6 +3,7 @@ from src.adapters.rabbitmq import RabbitMQAdapter
 from src.adapters.mongodb import MongoDBAdapter
 from src.parsers.exabgp import ExaBGPParser
 from datetime import timedelta, datetime
+from src.webapp import start_webapp
 from mrtparse import Reader
 import click, time, sys
 from rich import print
@@ -195,3 +196,17 @@ def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_l
             parser.parse(
                 bgp4mp_message=message,
             )
+
+@cli.command(
+    name='webapp',
+    help='Open the admin webapp.',
+)
+@click.option(
+    '--reload',
+    '-r',
+    is_flag=True,
+)
+def webapp(reload: bool):
+    start_webapp(
+        reload=reload,
+    )
