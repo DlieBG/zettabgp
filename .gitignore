@@ -1,4 +1,6 @@
+mrt_library/
 src/ui/
+local/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
