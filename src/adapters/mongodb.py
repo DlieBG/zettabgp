@@ -67,6 +67,14 @@ class MongoDBAdapter:
             else:
                  aggregator = None
 
+            extended_community: Optional[list[str]] = None
+            if message.path_attributes.extended_community:
+                for ext_com in message.path_attributes.extended_community:
+                    if extended_community == None:
+                        extended_community = [str(ext_com)]
+                    else:
+                        extended_community.append(str(ext_com)) 
+
             '''creates dict for message with _id and other unique attributes, that dont change'''
             new_message_id = {
                 'timestamp' : message.timestamp,
@@ -89,7 +97,7 @@ class MongoDBAdapter:
                     'aggregator' : aggregator,
                     'community' : message.path_attributes.community,
                     'large_community' : message.path_attributes.large_community,
-                    'extended_community' : message.path_attributes.extended_community,
+                    'extended_community' : extended_community,
                     'orginator_id' : message.path_attributes.orginator_id,
                     'cluster_list' : message.path_attributes.cluster_list,
                 },
@@ -112,7 +120,7 @@ class MongoDBAdapter:
                         'aggregator' : aggregator,
                         'community' : message.path_attributes.community,
                         'large_community' : message.path_attributes.large_community,
-                        'extended_community' : message.path_attributes.extended_community,
+                        'extended_community' : extended_community,
                         'orginator_id' : message.path_attributes.orginator_id,
                         'cluster_list' : message.path_attributes.cluster_list,
                     },
