@@ -32,7 +32,7 @@ import { AnomalyExplorerComponent } from './components/anomaly-explorer/anomaly-
     MatTabsModule,
   ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent]
 })
