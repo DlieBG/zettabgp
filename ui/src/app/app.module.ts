@@ -13,13 +13,19 @@ import { HomeComponent } from './components/home/home.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MrtLibraryComponent } from './components/mrt-library/mrt-library.component';
 import { AnomalyExplorerComponent } from './components/anomaly-explorer/anomaly-explorer.component';
+import { MrtScenarioComponent } from './components/mrt-library/mrt-scenario/mrt-scenario.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { RabbitmqComponent } from './components/rabbitmq/rabbitmq.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     MrtLibraryComponent,
-    AnomalyExplorerComponent
+    AnomalyExplorerComponent,
+    MrtScenarioComponent,
+    RabbitmqComponent
   ],
   imports: [
     BrowserModule,
@@ -30,6 +36,8 @@ import { AnomalyExplorerComponent } from './components/anomaly-explorer/anomaly-
     MatIconModule,
     MatButtonModule,
     MatTabsModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
   ],
   providers: [
     provideAnimationsAsync(),
