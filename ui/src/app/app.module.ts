@@ -17,6 +17,7 @@ import { MrtScenarioComponent } from './components/mrt-library/mrt-scenario/mrt-
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { RabbitmqComponent } from './components/rabbitmq/rabbitmq.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { RabbitmqComponent } from './components/rabbitmq/rabbitmq.component';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    MatProgressBarModule,
   ],
   providers: [
     provideAnimationsAsync(),

@@ -18,7 +18,7 @@ def _get_mrt_library() -> MRTLibrary:
     )
 
     for scenario_file in Path(
-        os.getenv('ZETTABGP_WEBAPP_MRT_LIBRARY_PATH', 'src/mrt_library')
+        os.getenv('ZETTABGP_WEBAPP_MRT_LIBRARY_PATH', 'mrt_library')
     ).glob('**/scenario.json'):
         with open(scenario_file, 'r') as file:
             scenario = json.loads(file.read())

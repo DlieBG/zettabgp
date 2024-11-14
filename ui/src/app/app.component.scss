@@ -5,7 +5,8 @@
 }
 
 .toolbar {
-    background-color: #004f4f;
+  background-color: #004f4f;
+  min-height: 64px;
 }
 
 .spacer {
@@ -14,9 +15,11 @@
 
 .router {
   height: 100%;
+  overflow: hidden;
 }
 
 .footer {
+  min-height: 24px;
   color: lightgrey;
   font-size: 14px;
   display: flex;

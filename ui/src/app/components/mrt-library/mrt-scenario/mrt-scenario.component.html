@@ -1,0 +1,89 @@
+<div class="body">
+    <mat-card appearance="outlined">
+        <mat-card-content>
+            <h4>{{ mrtScenario.name }}</h4>
+            <p>{{ mrtScenario.description }}</p>
+
+            <table>
+                <tr>
+                    <td>No RabbitMQ Direct:</td>
+                    <td>
+                        <pre>{{ mrtScenario.no_rabbitmq_direct | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>RabbitMQ Grouped:</td>
+                    <td>
+                        <pre>{{ mrtScenario.rabbitmq_grouped | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>No MongoDB Log:</td>
+                    <td>
+                        <pre>{{ mrtScenario.no_mongodb_log | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>No MongoDB State:</td>
+                    <td>
+                        <pre>{{ mrtScenario.no_mongodb_state | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>No MongoDB Statistics:</td>
+                    <td>
+                        <pre>{{ mrtScenario.no_mongodb_statistics | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Clear MongoDB:</td>
+                    <td>
+                        <pre>{{ mrtScenario.clear_mongodb | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Playback Speed:</td>
+                    <td>
+                        <pre>{{ mrtScenario.playback_speed | json }}</pre>
+                    </td>
+                </tr>
+                <tr>
+                    <td>MRT Files:</td>
+                    <td>
+                        <pre>{{ mrtScenario.mrt_files.length| json }}</pre>
+                    </td>
+                </tr>
+            </table>
+
+            <hr>
+
+            <div class="action">
+                <button mat-stroked-button color="accent" (click)="startMrtScenario()">
+                    <mat-icon>play_circle</mat-icon>
+                    Replay
+                </button>
+
+                <div class="response">
+                    @if (mrtScenarioResponse$) {
+                    @if (mrtScenarioResponse$ | async; as mrtScenarioResponse) {
+                        <div class="success">
+                            <mat-icon>check_circle</mat-icon>
+                            <div>
+                                <div>
+                                    Announced Routes: {{ mrtScenarioResponse.count_announce }}
+                                </div>
+                                <div>
+                                    Withdrawn Routes: {{ mrtScenarioResponse.count_withdraw }}
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @else {
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                    }
+                    }
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,0 +1,11 @@
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    margin-top: 4em;
+}

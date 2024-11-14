@@ -12,11 +12,11 @@ export class MrtLibraryService {
     private httpClient: HttpClient,
   ) { }
 
-  get_mrt_library(): Observable<MRTLibrary> {
+  getMrtLibrary(): Observable<MRTLibrary> {
     return this.httpClient.get<MRTLibrary>('api/mrt-library');
   }
 
-  start_mrt_library(mrtScenarioRequest: MRTScenarioRequest): Observable<MRTScenarioResponse> {
+  startMrtScenario(mrtScenarioRequest: MRTScenarioRequest): Observable<MRTScenarioResponse> {
     return this.httpClient.post<MRTScenarioResponse>('api/mrt-library', mrtScenarioRequest);
   }
 
