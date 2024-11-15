@@ -51,6 +51,13 @@ RABBIT_MQ_HOST
 MONGO_DB_HOST
 MONGO_DB_PORT
 ```
+For internal configurations there are these variables too.\
+But only overwrite them when you are debugging the respective parts locally.
+```
+ZETTABGP_WEBAPP_UI_PATH
+ZETTABGP_WEBAPP_APP
+ZETTABGP_WEBAPP_MRT_LIBRARY_PATH
+```
 
 ## Usage
 ZettaBGP provides a CLI interface with some commands for testbed simulations as well for production use.
