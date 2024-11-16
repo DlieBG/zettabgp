@@ -1,0 +1,46 @@
+<div class="body">
+  <mat-toolbar class="toolbar">
+    <span>
+      ZettaBGP WebApp
+    </span>
+
+    <span class="spacer"></span>
+
+    <a mat-button href="https://git.univ.leitwert.net/imprj/01-bgp-testbed/zettabgp" target="_blank">
+      <mat-icon>description</mat-icon>
+      Documentation
+    </a>
+    <a mat-button href="https://git.univ.leitwert.net/imprj/01-bgp-testbed/zettabgp/-/issues/new" target="_blank">
+      <mat-icon>bug_report</mat-icon>
+      Report Bug
+    </a>
+  </mat-toolbar>
+
+  <div class="router">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div class="footer">
+    <div class="version">
+      <span>
+        ZettaBGP:
+      </span>
+
+      @if (zettabgpVersion | async; as zettabgpVersion) {
+      <span>
+        v{{ zettabgpVersion }}
+      </span>
+      }
+      @else {
+      <span>
+        loading...
+      </span>
+      }
+    </div>
+    <div class="version">
+      <span>
+        WebApp: v{{ webappVersion }}
+      </span>
+    </div>
+  </div>
+</div>

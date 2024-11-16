@@ -1,0 +1,14 @@
+<div class="body">
+    @if (mrtLibrary | async; as mrtLibrary) {
+    <div class="list">
+        @for (mrtScenario of mrtLibrary.scenarios; track $index) {
+        <app-mrt-scenario [mrtScenario]="mrtScenario"></app-mrt-scenario>
+        }
+    </div>
+    }
+    @else {
+    <div class="loader">
+        <mat-spinner diameter="75" strokeWidth="6"></mat-spinner>
+    </div>
+    }
+</div>

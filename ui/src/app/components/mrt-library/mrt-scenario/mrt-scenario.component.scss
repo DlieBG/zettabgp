@@ -1,0 +1,46 @@
+.body {
+    margin: 2em;
+    width: 500px;
+}
+
+h4 {
+    font-size: 24px;
+}
+
+table {
+    tr {
+        line-height: 0;
+
+        td {
+            padding: 0;
+            font-size: smaller;
+            padding-right: .5em;
+        }
+    }
+}
+
+.action {
+    display: flex;
+    align-items: center;
+    margin-top: 1em;
+    min-height: 48px;
+}
+
+button {
+    margin-right: 3em;
+}
+
+.response {
+    width: 100%;
+    margin-right: 1em;
+}
+
+.success {
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+        color: forestgreen;
+        margin-right: 1em;
+    }
+}
