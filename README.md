@@ -164,7 +164,7 @@ Please keep in mind that most of the mrt files only contain a timeslot of 15 min
 #### `zettabgp webapp`
 This command launches the debugging WebApp with MRT Library, Anomaly Explorer and the RabbitMQ interface.\
 The WebApp will be exposed on port `8000` by default.\
-You can access the ui using this link: http://127.0.0.1:8000/\
+You can access the ui using this link: http://127.0.0.1:8000/ \
 For the management of the MRT Library refer to this section above. [Local MRT Library](#local-mrt-library)
 
 ## Debugging
