@@ -36,6 +36,28 @@ process zettabgp {
 }
 ```
 
+### Local MRT Library
+For the WebApp you can provide a local MRT Library.\
+This library contains several MRT Scenarios which define a predefined scenario for simulating MRT files with specific configurations.\
+This library is managed via `scenario.json` files in the `mrt_library` directory.\
+The syntax for the `scenario.json` files is the following.
+```json
+{
+    "name": "Test Scenario 1",
+    "description": "This is a test scenario.",
+    "no_rabbitmq_direct": false,
+    "rabbitmq_grouped": 5,
+    "no_mongodb_log": true,
+    "no_mongodb_state": true,
+    "no_mongodb_statistics": true,
+    "clear_mongodb": false,
+    "playback_speed": null,
+    "mrt_files": [
+        "20241005_0130_1728091800_bgp_lw_ixp_decix_update.bz2"
+    ]
+}
+```
+
 ### Database and Message Queue
 A sample setup for MongoDB and RabbitMQ is provided in the `db` directory.\
 To run the docker compose setup run the following command in that directory.\
@@ -138,6 +160,12 @@ A 10 minute interval playback looks like that.
 zettabgp mrt-simulation <mrt-file> -o 10
 ```
 Please keep in mind that most of the mrt files only contain a timeslot of 15 minutes.
+
+#### `zettabgp webapp`
+This command launches the debugging WebApp with MRT Library, Anomaly Explorer and the RabbitMQ interface.\
+The WebApp will be exposed on port `8000` by default.\
+You can access the ui using this link: http://127.0.0.1:8000/\
+For the management of the MRT Library refer to this section above. [Local MRT Library](#local-mrt-library)
 
 ## Debugging
 Some sample json messages for debugging purposes from ExaBGP can be found in the `samples` directory.
