@@ -225,17 +225,68 @@ class MongoDBAdapter:
                         statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
 
 class RibImport:
-    '''This class imports a rib-file in mongodb'''
-    database_client = MongoClient(
-    host=os.getenv('MONGO_DB_HOST', 'localhost'),
-    port=int(os.getenv('MONGO_DB_PORT', 27017)),
-    )
-    rib_db = database_client.rib_load
-    rib_collection = rib_db.storage
-    def __init__(self, clear_mongodb: bool):
+    def __init__(self, parser: RouteUpdateParser,clear_mongodb: bool):
+        '''This class imports a rib-file in mongodb'''
+        database_client = MongoClient(
+        host=os.getenv('MONGO_DB_HOST', 'localhost'),
+        port=int(os.getenv('MONGO_DB_PORT', 27017)),
+        )
+        rib_db = database_client.rib_load
+        rib_collection = rib_db.storage
         if clear_mongodb:
-            self.rib_collection.delete_many({})
+            rib_collection.delete_many({})
 
-    def write_rib(self, statement: OrderedDict):
-        rib_announce = self.rib_collection.insert_one(json.loads(json.dumps(statement)))
+        @parser.on_update
+        def on_update(message: RouteUpdate):
+            if message.path_attributes.origin:
+                origins = message.path_attributes.origin.value
+            else:
+                origins = None
+            
+            as_paths: Optional[list[int, list[int]]] = None
+            if message.path_attributes.as_path:
+                for as_pa in message.path_attributes.as_path:
+                    if as_paths == None:
+                        as_paths = [[as_pa.type.value, as_pa.value]]
+                    else:
+                        as_paths.append([as_pa.type.value, as_pa.value])
+                 
+            if message.path_attributes.aggregator:
+                aggregator = {
+                    'router_id' : message.path_attributes.aggregator.router_id,
+                    'router_as' : message.path_attributes.aggregator.router_as,
+                    }
+            else:
+                 aggregator = None
+
+            '''creates dict for message with _id and other unique attributes, that dont change'''
+            new_message_id = {
+                'timestamp' : message.timestamp,
+                'peer_ip' : message.peer_ip,
+                'local_ip' : message.local_ip,
+                'peer_as' : message.peer_as,
+                'local_as' : message.local_as,
+                'change_type' : None,
+                'nlri' : {
+                    'prefix' : message.nlri.prefix,
+                    'length' : message.nlri.length,
+                },
+                'path_attributes': {
+                    'origin' : origins,
+                    'as_path' : as_paths,
+                    'next_hop' : message.path_attributes.next_hop,
+                    'multi_exit_disc' : message.path_attributes.multi_exit_disc,
+                    'local_pref' : message.path_attributes.local_pref,
+                    'atomic_aggregate' : message.path_attributes.atomic_aggregate,
+                    'aggregator' : aggregator,
+                    'community' : message.path_attributes.community,
+                    'large_community' : message.path_attributes.large_community,
+                    'extended_community' : message.path_attributes.extended_community,
+                    'orginator_id' : message.path_attributes.orginator_id,
+                    'cluster_list' : message.path_attributes.cluster_list,
+                },
+                '_id' : ObjectId(),
+            }
+            rib_collection.insert_one(new_message_id)
+            
         
