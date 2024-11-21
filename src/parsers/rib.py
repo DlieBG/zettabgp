@@ -209,7 +209,6 @@ class RibParser(RouteUpdateParser):
         
         rib_entries = statement['rib_entries']
         
-        #key = list((statement['timestamp'].keys()))[0]
         for entrie in rib_entries:
             generic_update = RouteUpdate(
                 timestamp=datetime.fromtimestamp(

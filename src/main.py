@@ -11,9 +11,9 @@ Author:
     Sebastian Forstner <sef9869@thi.de>
 '''
 import src.services.mrt_simulation as mrt_simulation_service
+from src.adapters.rabbitmq import RabbitMQAdapter
+from src.adapters.mongodb import MongoDBAdapter
 import src.services.exabgp as exabgp_service
-from src.adapters.mongodb import RibImport
-from src.adapters.mongodb import RibImport
 from datetime import timedelta, datetime
 from src.parsers.rib import RibParser
 from src.webapp import start_webapp
@@ -235,6 +235,16 @@ def webapp(reload: bool):
     is_flag=True,
 )
 @click.option(
+    '--no-mongodb-state',
+    '-s',
+    is_flag=True,
+)
+@click.option(
+    '--no-mongodb-statistics',
+    '-t',
+    is_flag=True,
+)
+@click.option(
     '--clear-mongodb',
     '-c',
     is_flag=True,
@@ -266,20 +276,23 @@ def webapp(reload: bool):
         resolve_path=True,
     ),
 )
-def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, rib_file: str):
+def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, rib_file: str):
     parser = RibParser()
 
-    #if not no_rabbitmq_direct or rabbitmq_grouped:
-    #    RabbitMQAdapter(
-    #        parser=parser,
-    #        no_direct=no_rabbitmq_direct,
-    #        queue_interval=rabbitmq_grouped,
-    #    )
-    
-    if not no_mongodb_log: 
-        RibImport(
+    if not no_rabbitmq_direct or rabbitmq_grouped:
+        RabbitMQAdapter(
             parser=parser,
-            clear_mongodb=clear_mongodb
+            no_direct=no_rabbitmq_direct,
+            queue_interval=rabbitmq_grouped,
+        )
+    
+    if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
+        MongoDBAdapter(
+            parser=parser,
+            no_mongodb_log=no_mongodb_log,
+            no_mongodb_state=no_mongodb_state,
+            no_mongodb_statistics=no_mongodb_statistics,
+            clear_mongodb=clear_mongodb,
         )
 
     playback_speed_reference: datetime = None

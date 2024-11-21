@@ -107,6 +107,11 @@ class MongoDBAdapter:
                     else:
                         extended_community.append(str(ext_com)) 
 
+            if message.change_type:
+                change = message.change_type.value
+            else: 
+                change = None
+            
             # Creates dict for message with _id and other unique attributes, that don't change
             new_message_id = {
                 'timestamp' : message.timestamp,
@@ -114,7 +119,7 @@ class MongoDBAdapter:
                 'local_ip' : message.local_ip,
                 'peer_as' : message.peer_as,
                 'local_as' : message.local_as,
-                'change_type' : message.change_type.value,
+                'change_type' : change,
                 'nlri' : {
                     'prefix' : message.nlri.prefix,
                     'length' : message.nlri.length,
@@ -142,7 +147,7 @@ class MongoDBAdapter:
                     'timestamp' : message.timestamp,
                     'peer_ip' : message.peer_ip,
                     'peer_as' : message.peer_as,
-                    'change_type' : message.change_type.value,
+                    'change_type' : change,
                     'path_attributes': {
                        'origin' : origins,
                         'as_path' : as_paths,
@@ -161,7 +166,7 @@ class MongoDBAdapter:
             }
 
             # Route got withdrawn, db actions accordingly
-            if message.change_type == ChangeType.WITHDRAW:
+            if change == ChangeType.WITHDRAW:
                 if not log_flag:
                     log_announce = log_collection.insert_one(new_message_id)
 
@@ -193,7 +198,7 @@ class MongoDBAdapter:
                     statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
 
             # Route got announced, db actions accordingly
-            if message.change_type == ChangeType.ANNOUNCE:
+            if change == ChangeType.ANNOUNCE:
                 if not log_flag:
                     log_announce = log_collection.insert_one(new_message_id)
 
@@ -224,69 +229,34 @@ class MongoDBAdapter:
                         }  
                         statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
 
-class RibImport:
-    def __init__(self, parser: RouteUpdateParser,clear_mongodb: bool):
-        '''This class imports a rib-file in mongodb'''
-        database_client = MongoClient(
-        host=os.getenv('MONGO_DB_HOST', 'localhost'),
-        port=int(os.getenv('MONGO_DB_PORT', 27017)),
-        )
-        rib_db = database_client.rib_load
-        rib_collection = rib_db.storage
-        if clear_mongodb:
-            rib_collection.delete_many({})
+            '''no change type given, used for rib files'''
+            if change == None:
+                if not log_flag:
+                    log_announce = log_collection.insert_one(new_message_id)
 
-        @parser.on_update
-        def on_update(message: RouteUpdate):
-            if message.path_attributes.origin:
-                origins = message.path_attributes.origin.value
-            else:
-                origins = None
-            
-            as_paths: Optional[list[int, list[int]]] = None
-            if message.path_attributes.as_path:
-                for as_pa in message.path_attributes.as_path:
-                    if as_paths == None:
-                        as_paths = [[as_pa.type.value, as_pa.value]]
+                if not state_flag:
+                    state_filter = {'nlri': {'prefix': new_message_id['nlri']['prefix'], 'length': new_message_id['nlri']['length']}}
+                    state_announce = state_collection.update_one(state_filter, set_message, upsert=True)
+                
+                if not statistics_flag:
+                    statistics_filter = {'nlri': {'prefix': new_message_id['nlri']['prefix'], 'length': new_message_id['nlri']['length']}}
+                    statistics_object = statistics_collection.find_one(statistics_filter)
+                    if statistics_object:
+                        new_values = {
+                            '$set': {
+                                'change_count' : statistics_object['change_count'] + 1,
+                                'current_timestamp' : message.timestamp,
+                                'last_timestamp' : statistics_object['current_timestamp'],
+                            }
+                        }
                     else:
-                        as_paths.append([as_pa.type.value, as_pa.value])
-                 
-            if message.path_attributes.aggregator:
-                aggregator = {
-                    'router_id' : message.path_attributes.aggregator.router_id,
-                    'router_as' : message.path_attributes.aggregator.router_as,
-                    }
-            else:
-                 aggregator = None
-
-            '''creates dict for message with _id and other unique attributes, that dont change'''
-            new_message_id = {
-                'timestamp' : message.timestamp,
-                'peer_ip' : message.peer_ip,
-                'local_ip' : message.local_ip,
-                'peer_as' : message.peer_as,
-                'local_as' : message.local_as,
-                'change_type' : None,
-                'nlri' : {
-                    'prefix' : message.nlri.prefix,
-                    'length' : message.nlri.length,
-                },
-                'path_attributes': {
-                    'origin' : origins,
-                    'as_path' : as_paths,
-                    'next_hop' : message.path_attributes.next_hop,
-                    'multi_exit_disc' : message.path_attributes.multi_exit_disc,
-                    'local_pref' : message.path_attributes.local_pref,
-                    'atomic_aggregate' : message.path_attributes.atomic_aggregate,
-                    'aggregator' : aggregator,
-                    'community' : message.path_attributes.community,
-                    'large_community' : message.path_attributes.large_community,
-                    'extended_community' : message.path_attributes.extended_community,
-                    'orginator_id' : message.path_attributes.orginator_id,
-                    'cluster_list' : message.path_attributes.cluster_list,
-                },
-                '_id' : ObjectId(),
-            }
-            rib_collection.insert_one(new_message_id)
-            
-        
+                        new_values = {
+                            '$set': {
+                                'change_count' :1,
+                                'current_timestamp' : message.timestamp,
+                                'last_timestamp' : message.timestamp,
+                                'nlri' : new_message_id['nlri'],
+                                '_id' : ObjectId(),
+                            }
+                        }
+                    statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
