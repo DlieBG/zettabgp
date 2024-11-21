@@ -84,7 +84,7 @@ ZETTABGP_WEBAPP_MRT_LIBRARY_PATH
 ## Usage
 ZettaBGP provides a CLI interface with some commands for testbed simulations as well for production use.
 
-### Comands
+### Commands
 #### `zettabgp exabgp`
 The `exabgp` subcommand is used for processing ExaBGP Messages.\
 The process can be started from within ExaBGP.\
@@ -112,7 +112,7 @@ When no `-g` option is present, no grouped updates will appear at all.
 
 #### `zettabgp mrt-simulation`
 The `mrt-simulation` subcommand is used for processing mrt files.\
-It is mendatory to provide a valid path to at least one mrt file.\
+It is mandatory to provide a valid path to at least one mrt file.\
 `mrt-simulation` also supports the handling of multiple mrt files.\
 But keep in mind to provide sequentially sorted mrt files based on the timeframe.\
 Otherwise the grouping feature will not work properly!
@@ -147,7 +147,7 @@ zettabgp mrt-simulation <mrt-file> -p 2
 ```
 
 ##### Playback Interval
-For debugging the timebased group update queue, it is very useful to playback all update messages that occur within an interval of for example 5 minutes.\
+For debugging the timebase group update queue, it is very useful to playback all update messages that occur within an interval of for example 5 minutes.\
 When you specify option `-o` you can set a playback interval in minutes that defaults to 5 minutes.\
 Between the intervals you have to press enter to continue with the replay of the next interval.\
 Of course you can combine this option with the playback speed option.\

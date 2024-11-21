@@ -1,9 +1,8 @@
 from src.models.mrt_library import MRTScenarioRequest, MRTScenarioResult, MRTScenario, MRTLibrary
+from src.services.mrt_simulation import mrt_simulation
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
 import json, os
-
-from src.services.mrt_simulation import MRTSimulationResult, mrt_simulation
 
 mrt_library_router = APIRouter()
 
