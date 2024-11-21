@@ -14,7 +14,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
             length=nlri['length'],
         )
     
-    def _get_path_attribute(self, path_attributes: OrderedDict, type: dict) -> dict:
+    def _get_path_attribute(self, path_attributes: list[OrderedDict], type: dict) -> dict:
         for path_attribute in path_attributes:
             path_attribute = dict(path_attribute)
 
@@ -100,7 +100,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
 
         return multi_exit_disc['value']
 
-    def _parse_atomic_aggregate(self, path_attributes: list[OrderedDict]) -> int:
+    def _parse_atomic_aggregate(self, path_attributes: list[OrderedDict]) -> bool:
         atomic_aggregate = self._get_path_attribute(
             path_attributes=path_attributes,
             type={6: 'ATOMIC_AGGREGATE'},
