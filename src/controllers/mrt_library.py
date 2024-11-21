@@ -1,14 +1,9 @@
 from src.models.mrt_library import MRTScenarioRequest, MRTScenarioResult, MRTScenario, MRTLibrary
-from src.parsers.mrt_bgp4mp import MrtBgp4MpParser
-from src.adapters.rabbitmq import RabbitMQAdapter
-from src.adapters.mongodb import MongoDBAdapter
-from src.models.route_update import ChangeType
-from fastapi.exceptions import HTTPException
-from datetime import datetime
-from fastapi import APIRouter
-from mrtparse import Reader
+from fastapi import APIRouter, HTTPException
 from pathlib import Path
-import json, time, os
+import json, os
+
+from src.services.mrt_simulation import MRTSimulationResult, mrt_simulation
 
 mrt_library_router = APIRouter()
 
@@ -49,65 +44,26 @@ def start_mrt_scenario(mrt_scenario_request: MRTScenarioRequest) -> MRTScenarioR
     )
 
     if not scenario:
-        return HTTPException(
+        raise HTTPException(
             status_code=400,
             detail='Scenario not found.',
         )
 
-    mrt_scenario_result = MRTScenarioResult(
-        count_announce=0,
-        count_withdraw=0,
+    mrt_simulation_result = mrt_simulation(
+        no_rabbitmq_direct=scenario.no_rabbitmq_direct,
+        rabbitmq_grouped=scenario.rabbitmq_grouped,
+        no_mongodb_log=scenario.no_mongodb_log,
+        no_mongodb_state=scenario.no_mongodb_state,
+        no_mongodb_statistics=scenario.no_mongodb_statistics,
+        clear_mongodb=scenario.clear_mongodb,
+        playback_speed=scenario.playback_speed,
+        mrt_files=tuple([
+            str(Path(scenario.path) / Path(mrt_file))
+                for mrt_file in scenario.mrt_files
+        ]),
     )
 
-    parser = MrtBgp4MpParser()
-
-    if not scenario.no_rabbitmq_direct or scenario.rabbitmq_grouped:
-        RabbitMQAdapter(
-            parser=parser,
-            no_direct=scenario.no_rabbitmq_direct,
-            queue_interval=scenario.rabbitmq_grouped,
-        )
-
-    if not scenario.no_mongodb_log or not scenario.no_mongodb_state or not scenario.no_mongodb_statistics:
-        MongoDBAdapter(
-            parser=parser,
-            no_mongodb_log=scenario.no_mongodb_log,
-            no_mongodb_state=scenario.no_mongodb_state,
-            no_mongodb_statistics=scenario.no_mongodb_statistics,
-            clear_mongodb=scenario.clear_mongodb,
-        )
-
-    playback_speed_reference: datetime = None
-
-    for mrt_file in scenario.mrt_files:
-        mrt_file = str(Path(scenario.path) / Path(mrt_file))
-
-        for message in Reader(mrt_file):
-            if message.data['type'] != {16: 'BGP4MP'}:
-                print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
-                print(message.data['type'])
-                continue
-
-            current_timestamp: datetime = datetime.fromtimestamp(
-                timestamp=list(message.data['timestamp'].keys())[0],
-            )
-
-            if scenario.playback_speed:
-                if playback_speed_reference:
-                    time.sleep((current_timestamp - playback_speed_reference).seconds / scenario.playback_speed)
-
-                playback_speed_reference = current_timestamp
-
-            updates = parser.parse(
-                bgp4mp_message=message,
-            )
-
-            if updates:
-                for update in updates:
-                    match update.change_type:
-                        case ChangeType.ANNOUNCE:
-                            mrt_scenario_result.count_announce += 1
-                        case ChangeType.WITHDRAW:
-                            mrt_scenario_result.count_withdraw += 1
-
-    return mrt_scenario_result
+    return MRTScenarioResult(
+        count_announce=mrt_simulation_result.count_announce,
+        count_withdraw=mrt_simulation_result.count_withdraw,
+    )

@@ -1,12 +1,9 @@
-from src.parsers.mrt_bgp4mp import MrtBgp4MpParser
+import src.services.mrt_simulation as mrt_simulation_service
 from src.adapters.rabbitmq import RabbitMQAdapter
 from src.adapters.mongodb import MongoDBAdapter
 from src.parsers.exabgp import ExaBGPParser
-from datetime import timedelta, datetime
 from src.webapp import start_webapp
-from mrtparse import Reader
 import click, time, sys
-from rich import print
 
 @click.group()
 def cli():
@@ -147,55 +144,17 @@ def exabgp(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool
     nargs=-1,
 )
 def mrt_simulation(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, mrt_files: tuple[str]):
-    parser = MrtBgp4MpParser()
-
-    if not no_rabbitmq_direct or rabbitmq_grouped:
-        RabbitMQAdapter(
-            parser=parser,
-            no_direct=no_rabbitmq_direct,
-            queue_interval=rabbitmq_grouped,
-        )
-
-    if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
-        MongoDBAdapter(
-            parser=parser,
-            no_mongodb_log=no_mongodb_log,
-            no_mongodb_state=no_mongodb_state,
-            no_mongodb_statistics=no_mongodb_statistics,
-            clear_mongodb=clear_mongodb,
-        )
-
-    playback_speed_reference: datetime = None
-    playback_interval_stop: datetime = None
-
-    for mrt_file in mrt_files:
-        for message in Reader(mrt_file):
-            if message.data['type'] != {16: 'BGP4MP'}:
-                print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
-                print(message.data['type'])
-                continue
-
-            current_timestamp: datetime = datetime.fromtimestamp(
-                timestamp=list(message.data['timestamp'].keys())[0],
-            )
-
-            if playback_speed:
-                if playback_speed_reference:
-                    time.sleep((current_timestamp - playback_speed_reference).seconds / playback_speed)
-
-                playback_speed_reference = current_timestamp
-
-            if playback_interval:
-                if playback_interval_stop:
-                    if current_timestamp > playback_interval_stop:
-                        input('Enter for next interval...')
-                        playback_interval_stop = playback_interval_stop + timedelta(minutes=playback_interval)
-                else:
-                    playback_interval_stop = current_timestamp + timedelta(minutes=playback_interval)
-
-            parser.parse(
-                bgp4mp_message=message,
-            )
+    mrt_simulation_service.mrt_simulation(
+        no_rabbitmq_direct=no_rabbitmq_direct,
+        rabbitmq_grouped=rabbitmq_grouped,
+        no_mongodb_log=no_mongodb_log,
+        no_mongodb_state=no_mongodb_state,
+        no_mongodb_statistics=no_mongodb_statistics,
+        clear_mongodb=clear_mongodb,
+        playback_speed=playback_speed,
+        playback_interval=playback_interval,
+        mrt_files=mrt_files,
+    )
 
 @cli.command(
     name='webapp',
