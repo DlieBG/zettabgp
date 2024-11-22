@@ -1,18 +1,33 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.models.mrt_library import MRTScenarioRequest, MRTScenarioResult, MRTScenario, MRTLibrary
-from src.parsers.mrt_bgp4mp import MrtBgp4MpParser
-from src.adapters.rabbitmq import RabbitMQAdapter
-from src.adapters.mongodb import MongoDBAdapter
-from src.models.route_update import ChangeType
-from fastapi.exceptions import HTTPException
-from datetime import datetime
-from fastapi import APIRouter
-from mrtparse import Reader
+from src.services.mrt_simulation import mrt_simulation
+from fastapi import APIRouter, HTTPException
 from pathlib import Path
-import json, time, os
+import json, os
 
 mrt_library_router = APIRouter()
 
 def _get_mrt_library() -> MRTLibrary:
+    '''
+    This function returns the MRT library.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Returns:
+        MRTLibrary: The MRT library.
+    '''
     mrt_library = MRTLibrary(
         scenarios=[],
     )
@@ -34,80 +49,74 @@ def _get_mrt_library() -> MRTLibrary:
     return mrt_library
 
 def _get_mrt_scenario(id: str) -> MRTScenario:
+    '''
+    This function returns an MRT scenario by its ID.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Args:
+        id (str): The ID of the MRT scenario.
+
+    Returns:
+        MRTScenario: The MRT scenario.
+    '''
     for scenario in _get_mrt_library().scenarios:
         if scenario.id == id:
             return scenario
 
 @mrt_library_router.get('/')
 def get_mrt_library() -> MRTLibrary:
+    '''
+    This function returns the MRT library.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Returns:
+        MRTLibrary: The MRT library.
+    '''
     return _get_mrt_library()
 
 @mrt_library_router.post('/')
 def start_mrt_scenario(mrt_scenario_request: MRTScenarioRequest) -> MRTScenarioResult:
+    '''
+    This function starts an MRT scenario.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Args:
+        mrt_scenario_request (MRTScenarioRequest): The MRT scenario request.
+
+    Returns:
+        MRTScenarioResult: The MRT scenario result.
+    '''
     scenario = _get_mrt_scenario(
         id=mrt_scenario_request.id,
     )
 
     if not scenario:
-        return HTTPException(
+        raise HTTPException(
             status_code=400,
             detail='Scenario not found.',
         )
 
-    mrt_scenario_result = MRTScenarioResult(
-        count_announce=0,
-        count_withdraw=0,
+    mrt_simulation_result = mrt_simulation(
+        no_rabbitmq_direct=scenario.no_rabbitmq_direct,
+        rabbitmq_grouped=scenario.rabbitmq_grouped,
+        no_mongodb_log=scenario.no_mongodb_log,
+        no_mongodb_state=scenario.no_mongodb_state,
+        no_mongodb_statistics=scenario.no_mongodb_statistics,
+        clear_mongodb=scenario.clear_mongodb,
+        playback_speed=scenario.playback_speed,
+        mrt_files=tuple([
+            str(Path(scenario.path) / Path(mrt_file))
+                for mrt_file in scenario.mrt_files
+        ]),
     )
 
-    parser = MrtBgp4MpParser()
-
-    if not scenario.no_rabbitmq_direct or scenario.rabbitmq_grouped:
-        RabbitMQAdapter(
-            parser=parser,
-            no_direct=scenario.no_rabbitmq_direct,
-            queue_interval=scenario.rabbitmq_grouped,
-        )
-
-    if not scenario.no_mongodb_log or not scenario.no_mongodb_state or not scenario.no_mongodb_statistics:
-        MongoDBAdapter(
-            parser=parser,
-            no_mongodb_log=scenario.no_mongodb_log,
-            no_mongodb_state=scenario.no_mongodb_state,
-            no_mongodb_statistics=scenario.no_mongodb_statistics,
-            clear_mongodb=scenario.clear_mongodb,
-        )
-
-    playback_speed_reference: datetime = None
-
-    for mrt_file in scenario.mrt_files:
-        mrt_file = str(Path(scenario.path) / Path(mrt_file))
-
-        for message in Reader(mrt_file):
-            if message.data['type'] != {16: 'BGP4MP'}:
-                print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
-                print(message.data['type'])
-                continue
-
-            current_timestamp: datetime = datetime.fromtimestamp(
-                timestamp=list(message.data['timestamp'].keys())[0],
-            )
-
-            if scenario.playback_speed:
-                if playback_speed_reference:
-                    time.sleep((current_timestamp - playback_speed_reference).seconds / scenario.playback_speed)
-
-                playback_speed_reference = current_timestamp
-
-            updates = parser.parse(
-                bgp4mp_message=message,
-            )
-
-            if updates:
-                for update in updates:
-                    match update.change_type:
-                        case ChangeType.ANNOUNCE:
-                            mrt_scenario_result.count_announce += 1
-                        case ChangeType.WITHDRAW:
-                            mrt_scenario_result.count_withdraw += 1
-
-    return mrt_scenario_result
+    return MRTScenarioResult(
+        count_announce=mrt_simulation_result.count_announce,
+        count_withdraw=mrt_simulation_result.count_withdraw,
+    )

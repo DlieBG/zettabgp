@@ -1,10 +1,27 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, AsPathType, AsPath, NLRI
 from src.parsers.route_update import RouteUpdateParser
 from datetime import datetime
 import json
 
 class ExaBGPParser(RouteUpdateParser):
-    '''This class is responsible for parsing ExaBGP messages'''
+    '''
+    This class is responsible for parsing ExaBGP messages.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+    '''
     def _parse_origin(self, origin: str) -> OriginType:
         if origin is None:
             return None
@@ -76,6 +93,18 @@ class ExaBGPParser(RouteUpdateParser):
         )
 
     def parse(self, line: str) -> list[RouteUpdate]:
+        '''
+        Parse an ExaBGP message.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+
+        Args:
+            line (str): The ExaBGP message.
+
+        Returns:
+            list[RouteUpdate]: The parsed RouteUpdate objects.
+        '''
         route_updates: list[RouteUpdate] = []
 
         exabgp_message = json.loads(line)
@@ -96,7 +125,7 @@ class ExaBGPParser(RouteUpdateParser):
             ),
         )
 
-        '''Iterate over the withdraw routes and create RouteUpdate objects'''
+        # Iterate over the withdraw routes and create RouteUpdate objects
         for withdraw_routes in exabgp_message['neighbor']['message']['update'].get('withdraw', {}).values():
             for withdraw_route in withdraw_routes:
                 route_updates.append(
@@ -111,7 +140,7 @@ class ExaBGPParser(RouteUpdateParser):
                     )
                 )
 
-        '''Iterate over the announce routes and create RouteUpdate objects'''
+        # Iterate over the announce routes and create RouteUpdate objects
         for announce_hops in exabgp_message['neighbor']['message']['update'].get('announce', {}).values():
             for announce_hop, announce_routes in announce_hops.items():
                 for announce_route in announce_routes:

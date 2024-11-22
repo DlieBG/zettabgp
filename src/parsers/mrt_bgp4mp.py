@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, AsPathType, AsPath, NLRI
 from src.parsers.route_update import RouteUpdateParser
 from collections import OrderedDict
@@ -5,7 +17,12 @@ from datetime import datetime
 from mrtparse import Bgp4Mp
 
 class MrtBgp4MpParser(RouteUpdateParser):
-    '''This class is responsible for parsing MRT BGP4MP messages'''
+    '''
+    This class is responsible for parsing MRT BGP4MP messages.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+    '''
     def _parse_nlri(self, nlri: OrderedDict) -> NLRI:
         nlri = dict(nlri)
         
@@ -14,7 +31,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
             length=nlri['length'],
         )
     
-    def _get_path_attribute(self, path_attributes: OrderedDict, type: dict) -> dict:
+    def _get_path_attribute(self, path_attributes: list[OrderedDict], type: dict) -> dict:
         for path_attribute in path_attributes:
             path_attribute = dict(path_attribute)
 
@@ -100,7 +117,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
 
         return multi_exit_disc['value']
 
-    def _parse_atomic_aggregate(self, path_attributes: list[OrderedDict]) -> int:
+    def _parse_atomic_aggregate(self, path_attributes: list[OrderedDict]) -> bool:
         atomic_aggregate = self._get_path_attribute(
             path_attributes=path_attributes,
             type={6: 'ATOMIC_AGGREGATE'},
@@ -240,6 +257,18 @@ class MrtBgp4MpParser(RouteUpdateParser):
         ]
 
     def parse(self, bgp4mp_message: Bgp4Mp) -> list[RouteUpdate]:
+        '''
+        Parse a BGP4MP message.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+
+        Args:
+            bgp4mp_message (Bgp4Mp): The BGP4MP message.
+
+        Returns:
+            list[RouteUpdate]: The parsed RouteUpdate objects.
+        '''
         route_updates: list[RouteUpdate] = []
 
         bgp4mp_message = dict(bgp4mp_message.data)
@@ -261,7 +290,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
             ),
         )
 
-        '''Iterate over the withdraw routes and create RouteUpdate objects'''
+        # Iterate over the withdraw routes and create RouteUpdate objects
         for withdraw_route in nested_bgp4mp_message.get('withdrawn_routes', []) + self._parse_mp_unreach_nlri(
             path_attributes=nested_bgp4mp_message.get('path_attributes', []),
         ):
@@ -276,7 +305,7 @@ class MrtBgp4MpParser(RouteUpdateParser):
                 )
             )
 
-        '''Iterate over the announce routes and create RouteUpdate objects'''
+        # Iterate over the announce routes and create RouteUpdate objects
         for announce_route in nested_bgp4mp_message.get('nlri', []) + self._parse_mp_reach_nlri(
             path_attributes=nested_bgp4mp_message.get('path_attributes', []),
         ):

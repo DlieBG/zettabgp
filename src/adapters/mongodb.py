@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.parsers.route_update import RouteUpdateParser
 from src.models.route_update import RouteUpdate
 from src.models.route_update import ChangeType
@@ -7,10 +19,28 @@ from bson import ObjectId
 import os
 
 class MongoDBAdapter:
-    '''This class is responsible for receiving the parsed messages and forwarding them to both MongoDB databases'''
+    '''
+    This class is responsible for receiving the parsed messages and forwarding them to both MongoDB databases.
+
+    Author:
+        Sebastian Forstner <sef9869@thi.de>
+    '''
     def __init__(self, parser: RouteUpdateParser, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool):
+        '''
+        Initializes the MongoDBAdapter.
+
+        Author:
+            Sebastian Forstner <sef9869@thi.de>
+
+        Args:
+            parser (RouteUpdateParser): The parser to receive the parsed messages from.
+            no_mongodb_log (bool): Whether to disable the log storage.
+            no_mongodb_state (bool): Whether to disable the state storage.
+            no_mongodb_statistics (bool): Whether to disable the statistics storage.
+            clear_mongodb (bool): Whether to clear the MongoDB databases.
+        '''
         try:
-            '''Connects to MongoDB-Container running with Docker'''
+            # Connects to MongoDB-Container running with Docker
             database_client = MongoClient(
                 host=os.getenv('MONGO_DB_HOST', 'localhost'),
                 port=int(os.getenv('MONGO_DB_PORT', 27017)),
@@ -21,21 +51,22 @@ class MongoDBAdapter:
         log_flag = no_mongodb_log
         state_flag = no_mongodb_state
         statistics_flag = no_mongodb_statistics
-        '''Creates database and collection for log storrage'''
+
+        # Creates database and collection for log storage
         if not log_flag:
             log_db = database_client.message_log
             log_collection = log_db.storage
             if clear_mongodb:
                 log_collection.delete_many({})
         
-        '''Creates database and collection for state storrage'''
+        # Creates database and collection for state storage
         if not state_flag:
             state_db = database_client.message_state
             state_collection = state_db.storage
             if clear_mongodb:
                 state_collection.delete_many({})
 
-        '''Creates database and collection for statistics storrage'''
+        # Creates database and collection for statistics storage
         if not statistics_flag:
             statistics_db = database_client.message_statistics
             statistics_collection = statistics_db.storage
@@ -45,7 +76,7 @@ class MongoDBAdapter:
         @parser.on_update
         def on_update(message: RouteUpdate):
 
-            '''saves optional, non-base-type attributes for later use; required to guarantee save use of mongodb'''
+            # Saves optional, non-base-type attributes for later use; required to guarantee save use of mongodb
             if message.path_attributes.origin:
                 origins = message.path_attributes.origin.value
             else:
@@ -75,7 +106,7 @@ class MongoDBAdapter:
                     else:
                         extended_community.append(str(ext_com)) 
 
-            '''creates dict for message with _id and other unique attributes, that dont change'''
+            # Creates dict for message with _id and other unique attributes, that don't change
             new_message_id = {
                 'timestamp' : message.timestamp,
                 'peer_ip' : message.peer_ip,
@@ -103,7 +134,8 @@ class MongoDBAdapter:
                 },
                 '_id' : ObjectId(),
             }
-            '''creates dict used for collection updates, MUST NOT contain _id and should not contain other non changing attributes'''
+
+            # Creates dict used for collection updates, MUST NOT contain _id and should not contain other non changing attributes
             set_message = { 
                 '$set': {
                     'timestamp' : message.timestamp,
@@ -127,7 +159,7 @@ class MongoDBAdapter:
                 }
             }
 
-            '''route got withdrawn, db actions accordingly'''
+            # Route got withdrawn, db actions accordingly
             if message.change_type == ChangeType.WITHDRAW:
                 if not log_flag:
                     log_announce = log_collection.insert_one(new_message_id)
@@ -159,7 +191,7 @@ class MongoDBAdapter:
                         }
                     statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
 
-            '''route got announced, db actions accordingly'''
+            # Route got announced, db actions accordingly
             if message.change_type == ChangeType.ANNOUNCE:
                 if not log_flag:
                     log_announce = log_collection.insert_one(new_message_id)
