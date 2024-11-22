@@ -1,12 +1,36 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, AsPathType, AsPath, NLRI
 from src.parsers.exabgp import ExaBGPParser
 from datetime import datetime
 import unittest
 
 class ExaBGPParserTests(unittest.TestCase):
+    '''
+    Tests for the ExaBGP parser.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+    '''
     exabgp_parser = ExaBGPParser()
 
     def test_announce_basic_1(self):
+        '''
+        Test the parsing of a basic announce message.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+        '''
         self.assertEqual(
             first=self.exabgp_parser.parse(
                 line='{ "exabgp": "4.0.1", "time": 1729362675.303443, "host" : "node103", "pid" : 41610, "ppid" : 41609, "counter": 18, "type": "update", "neighbor": { "address": { "local": "172.17.179.103", "peer": "172.17.179.104" }, "asn": { "local": 1, "peer": 1 } , "direction": "receive", "message": { "update": { "attribute": { "origin": "igp", "local-preference": 100 }, "announce": { "ipv4 unicast": { "172.17.179.104": [ { "nlri": "1.1.0.0/24" } ] } } } } } }',
@@ -35,6 +59,12 @@ class ExaBGPParserTests(unittest.TestCase):
         )
 
     def test_announce_basic_2(self):
+        '''
+        Test the parsing of a basic announce message.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+        '''
         self.assertEqual(
             first=self.exabgp_parser.parse(
                 line='{ "exabgp": "4.0.1", "time": 1729362676.3019273, "host" : "node103", "pid" : 41610, "ppid" : 41609, "counter": 19, "type": "update", "neighbor": { "address": { "local": "172.17.179.103", "peer": "172.17.179.104" }, "asn": { "local": 1, "peer": 1 } , "direction": "receive", "message": { "update": { "attribute": { "origin": "igp", "local-preference": 100 }, "announce": { "ipv4 unicast": { "172.17.179.104": [ { "nlri": "1.1.0.0/25" } ] } } } } } }',
@@ -63,6 +93,12 @@ class ExaBGPParserTests(unittest.TestCase):
         )
 
     def test_announce_large_community(self):
+        '''
+        Test the parsing of a announce message with large communities.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+        '''
         self.assertEqual(
             first=self.exabgp_parser.parse(
                 line='{ "exabgp": "4.0.1", "time": 1729363609.4892604, "host" : "node103", "pid" : 41733, "ppid" : 41732, "counter": 34, "type": "update", "neighbor": { "address": { "local": "172.17.179.103", "peer": "172.17.179.104" }, "asn": { "local": 1, "peer": 1 } , "direction": "receive", "message": { "update": { "attribute": { "origin": "igp", "as-path": [ 12779, 12654 ], "confederation-path": [], "med": 1110, "local-preference": 100, "aggregator": "64521:10.6.39.0", "community": [ [ 12779, 10401 ], [ 12779, 65000 ] ], "large-community": [ [ 6695, 1911 , 172 ], [ 6695, 1912 , 0 ], [ 6695, 1913 , 276 ], [ 6695, 1914 , 150 ] ] }, "announce": { "ipv6 unicast": { "2001:7f8::31eb:0:1": [ { "nlri": "2001:7fb:fe15::/48" } ] } } } } } }',
@@ -138,6 +174,12 @@ class ExaBGPParserTests(unittest.TestCase):
         )
     
     def test_withdraw_basic(self):
+        '''
+        Test the parsing of a basic withdraw message.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+        '''
         self.assertEqual(
             first=self.exabgp_parser.parse(
                 line='{ "exabgp": "4.0.1", "time": 1729362677.302448, "host" : "node103", "pid" : 41610, "ppid" : 41609, "counter": 20, "type": "update", "neighbor": { "address": { "local": "172.17.179.103", "peer": "172.17.179.104" }, "asn": { "local": 1, "peer": 1 } , "direction": "receive", "message": { "update": { "withdraw": { "ipv4 unicast": [ { "nlri": "1.1.0.0/24" } ] } } } } }',

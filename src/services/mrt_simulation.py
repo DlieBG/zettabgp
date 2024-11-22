@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.parsers.mrt_bgp4mp import MrtBgp4MpParser
 from src.adapters.rabbitmq import RabbitMQAdapter
 from src.adapters.mongodb import MongoDBAdapter
@@ -12,6 +24,27 @@ class MRTSimulationResult(BaseModel):
     count_withdraw: int
 
 def mrt_simulation(no_rabbitmq_direct: bool = False, rabbitmq_grouped: int = None, no_mongodb_log: bool = False, no_mongodb_state: bool = False, no_mongodb_statistics: bool = False, clear_mongodb: bool = False, playback_speed: int = None, playback_interval: int = None, mrt_files: tuple[str, ...] = ()) -> MRTSimulationResult:
+    '''
+    MRT Simulation service for retrieving BGP messages from MRT files and processing them.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+        Sebastian Forstner <sef9869@thi.de>
+
+    Args:
+        no_rabbitmq_direct (bool): Disable direct RabbitMQ direct queue..
+        rabbitmq_grouped (int): Queue group interval in minutes.
+        no_mongodb_log (bool): Disable logging to MongoDB.
+        no_mongodb_state (bool): Disable state storage to MongoDB.
+        no_mongodb_statistics (bool): Disable statistics storage to MongoDB.
+        clear_mongodb (bool): Clear MongoDB collections.
+        playback_speed (int): Playback speed in multiples of real time.
+        playback_interval (int): Playback interval in minutes.
+        mrt_files (tuple[str, ...]): MRT files to process.
+
+    Returns:
+        MRTSimulationResult: The result of the MRT simulation.
+    '''
     mrt_simulation_result = MRTSimulationResult(
         count_announce=0,
         count_withdraw=0,

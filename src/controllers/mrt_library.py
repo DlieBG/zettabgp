@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.models.mrt_library import MRTScenarioRequest, MRTScenarioResult, MRTScenario, MRTLibrary
 from src.services.mrt_simulation import mrt_simulation
 from fastapi import APIRouter, HTTPException
@@ -7,6 +19,15 @@ import json, os
 mrt_library_router = APIRouter()
 
 def _get_mrt_library() -> MRTLibrary:
+    '''
+    This function returns the MRT library.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Returns:
+        MRTLibrary: The MRT library.
+    '''
     mrt_library = MRTLibrary(
         scenarios=[],
     )
@@ -28,16 +49,49 @@ def _get_mrt_library() -> MRTLibrary:
     return mrt_library
 
 def _get_mrt_scenario(id: str) -> MRTScenario:
+    '''
+    This function returns an MRT scenario by its ID.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Args:
+        id (str): The ID of the MRT scenario.
+
+    Returns:
+        MRTScenario: The MRT scenario.
+    '''
     for scenario in _get_mrt_library().scenarios:
         if scenario.id == id:
             return scenario
 
 @mrt_library_router.get('/')
 def get_mrt_library() -> MRTLibrary:
+    '''
+    This function returns the MRT library.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Returns:
+        MRTLibrary: The MRT library.
+    '''
     return _get_mrt_library()
 
 @mrt_library_router.post('/')
 def start_mrt_scenario(mrt_scenario_request: MRTScenarioRequest) -> MRTScenarioResult:
+    '''
+    This function starts an MRT scenario.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+
+    Args:
+        mrt_scenario_request (MRTScenarioRequest): The MRT scenario request.
+
+    Returns:
+        MRTScenarioResult: The MRT scenario result.
+    '''
     scenario = _get_mrt_scenario(
         id=mrt_scenario_request.id,
     )
