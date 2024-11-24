@@ -167,6 +167,25 @@ The WebApp will be exposed on port `8000` by default.\
 You can access the ui using this link: http://127.0.0.1:8000/ \
 For the management of the MRT Library refer to this section above. [Local MRT Library](#local-mrt-library)
 
+#### `rib-load`
+This command lets you import the contents of rib files, similar to the `mrt-simulation`.\
+A path to a rib file is mandatory for this command.\
+This command uses the same options as `mrt-simulation`.
+```
+Arguments:
+  RIB_FILE
+
+Options:
+  -d, --no-rabbitmq-direct
+  -g, --rabbitmq-grouped INTEGER  Queue group interval in minutes. [default: (5)]
+  -l, --no-mongodb-log
+  -s, --no-mongodb-state
+  -t, --no-mongodb-statistics
+  -c, --clear-mongodb
+  -p, --playback-speed INTEGER    Playback speed in multiples of real time. [default: (1)]
+  -o, --playback-interval INTEGER Playback interval in minutes. [default: (5)]  
+```
+
 ## Debugging
 Some sample json messages for debugging purposes from ExaBGP can be found in the `samples` directory.
 
