@@ -170,7 +170,7 @@ For the management of the MRT Library refer to this section above. [Local MRT Li
 #### `rib-load`
 This command lets you import the contents of rib files, similar to the `mrt-simulation`.\
 A path to a rib file is mandatory for this command.\
-This command uses the same options as `mrt-simulation`.
+This command uses a part of the options as `mrt-simulation` does.
 ```
 Arguments:
   RIB_FILE
@@ -182,8 +182,6 @@ Options:
   -s, --no-mongodb-state
   -t, --no-mongodb-statistics
   -c, --clear-mongodb
-  -p, --playback-speed INTEGER    Playback speed in multiples of real time. [default: (1)]
-  -o, --playback-interval INTEGER Playback interval in minutes. [default: (5)]  
 ```
 
 ## Debugging

@@ -13,11 +13,10 @@ Author:
 from src.parsers.route_update import RouteUpdateParser
 from src.models.route_update import RouteUpdate
 from src.models.route_update import ChangeType
-from collections import OrderedDict
 from pymongo import MongoClient
 from typing import Optional
 from bson import ObjectId
-import json, os
+import os
 
 class MongoDBAdapter:
     '''
@@ -76,7 +75,6 @@ class MongoDBAdapter:
 
         @parser.on_update
         def on_update(message: RouteUpdate):
-
             # Saves optional, non-base-type attributes for later use; required to guarantee save use of mongodb
             if message.path_attributes.origin:
                 origins = message.path_attributes.origin.value
@@ -106,12 +104,7 @@ class MongoDBAdapter:
                         extended_community = [str(ext_com)]
                     else:
                         extended_community.append(str(ext_com)) 
-
-            if message.change_type:
-                change = message.change_type.value
-            else: 
-                change = None
-            
+           
             # Creates dict for message with _id and other unique attributes, that don't change
             new_message_id = {
                 'timestamp' : message.timestamp,
@@ -119,7 +112,7 @@ class MongoDBAdapter:
                 'local_ip' : message.local_ip,
                 'peer_as' : message.peer_as,
                 'local_as' : message.local_as,
-                'change_type' : change,
+                'change_type' : message.change_type.value,
                 'nlri' : {
                     'prefix' : message.nlri.prefix,
                     'length' : message.nlri.length,
@@ -147,7 +140,7 @@ class MongoDBAdapter:
                     'timestamp' : message.timestamp,
                     'peer_ip' : message.peer_ip,
                     'peer_as' : message.peer_as,
-                    'change_type' : change,
+                    'change_type' : message.change_type.value,
                     'path_attributes': {
                        'origin' : origins,
                         'as_path' : as_paths,
@@ -166,7 +159,7 @@ class MongoDBAdapter:
             }
 
             # Route got withdrawn, db actions accordingly
-            if change == ChangeType.WITHDRAW:
+            if message.change_type == ChangeType.WITHDRAW:
                 if not log_flag:
                     log_announce = log_collection.insert_one(new_message_id)
 
@@ -198,39 +191,7 @@ class MongoDBAdapter:
                     statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
 
             # Route got announced, db actions accordingly
-            if change == ChangeType.ANNOUNCE:
-                if not log_flag:
-                    log_announce = log_collection.insert_one(new_message_id)
-
-                if not state_flag:
-                    state_filter = {'nlri': {'prefix': new_message_id['nlri']['prefix'], 'length': new_message_id['nlri']['length']}}
-                    state_announce = state_collection.update_one(state_filter, set_message, upsert=True)
-                
-                if not statistics_flag:
-                    statistics_filter = {'nlri': {'prefix': new_message_id['nlri']['prefix'], 'length': new_message_id['nlri']['length']}}
-                    statistics_object = statistics_collection.find_one(statistics_filter)
-                    if statistics_object:
-                        new_values = {
-                            '$set': {
-                                'change_count' : (statistics_object['change_count'] + 1),
-                                'current_timestamp' : message.timestamp,
-                                'last_timestamp' : statistics_object['current_timestamp'],
-                            }
-                        }
-                    else:
-                        new_values = {
-                            '$set': {
-                                'change_count' :1,
-                                'current_timestamp' : message.timestamp,
-                                'last_timestamp' : message.timestamp,
-                                'nlri' : new_message_id['nlri'],
-                                '_id' : ObjectId(),
-                            }
-                        }  
-                        statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
-
-            '''no change type given, used for rib files'''
-            if change == None:
+            if message.change_type == ChangeType.ANNOUNCE:
                 if not log_flag:
                     log_announce = log_collection.insert_one(new_message_id)
 

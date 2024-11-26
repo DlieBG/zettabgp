@@ -14,7 +14,6 @@ import src.services.mrt_simulation as mrt_simulation_service
 from src.adapters.rabbitmq import RabbitMQAdapter
 from src.adapters.mongodb import MongoDBAdapter
 import src.services.exabgp as exabgp_service
-from datetime import timedelta, datetime
 from src.parsers.rib import RibParser
 from src.webapp import start_webapp
 from mrtparse import Reader
@@ -249,26 +248,6 @@ def webapp(reload: bool):
     '-c',
     is_flag=True,
 )
-@click.option(
-    '--playback-speed',
-    '-p',
-    type=int,
-    default=None,
-    show_default='1',
-    is_flag=False,
-    flag_value=1,
-    help='Playback speed in multiples of real time.',
-)
-@click.option(
-    '--playback-interval',
-    '-o',
-    type=int,
-    default=None,
-    show_default='5',
-    is_flag=False,
-    flag_value=5,
-    help='Playback interval in minutes.',
-)
 @click.argument(
     'rib_file',
     type=click.Path(
@@ -276,7 +255,7 @@ def webapp(reload: bool):
         resolve_path=True,
     ),
 )
-def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, rib_file: str):
+def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, rib_file: str):
     parser = RibParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
@@ -295,32 +274,11 @@ def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bo
             clear_mongodb=clear_mongodb,
         )
 
-    playback_speed_reference: datetime = None
-    playback_interval_stop: datetime = None
-
     for message in Reader(rib_file):
         if message.data['type'] != {13: 'TABLE_DUMP_V2'}:
             print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
             print(message.data['type'])
             continue
-
-        current_timestamp: datetime = datetime.fromtimestamp(
-            timestamp=list(message.data['timestamp'].keys())[0],
-        )
-
-        if playback_speed:
-            if playback_speed_reference:
-                time.sleep((current_timestamp - playback_speed_reference).seconds / playback_speed)
-
-            playback_speed_reference = current_timestamp
-
-        if playback_interval:
-            if playback_interval_stop:
-                if current_timestamp > playback_interval_stop:
-                    input('Enter for next interval...')
-                    playback_interval_stop = playback_interval_stop + timedelta(minutes=playback_interval)
-            else:
-                playback_interval_stop = current_timestamp + timedelta(minutes=playback_interval)
 
         parser.parse(
             statement=message.data,

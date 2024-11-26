@@ -2,10 +2,8 @@ from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Agg
 from src.parsers.route_update import RouteUpdateParser
 from collections import OrderedDict
 from datetime import datetime
-from mrtparse import Bgp4Mp
 
 class RibParser(RouteUpdateParser):
-
     def _get_path_attribute(self, path_attributes: list[OrderedDict], type: dict) -> dict:
         for path_attribute in path_attributes:
 
@@ -48,20 +46,16 @@ class RibParser(RouteUpdateParser):
                 case 'AS_CONFED_SEQUENCE':
                     return AsPathType.AS_CONFED_SEQUENCE
 
-        paths: list[AsPath] = []
-        for path in as_paths['value']:
-            value_as: list[int] = []
-            for path_value in path['value']:
-                value_as.append(int(path_value))
-            paths.append(
-                AsPath(
-                    type = _as_path_type(dict(path)),
-                    value = value_as
-                )
+        return [
+            AsPath(
+                type=_as_path_type(dict(as_path)),
+                value=[
+                    int(value) 
+                        for value in dict(as_path)['value']
+                ],
             )
-        
-        return paths
-
+                for as_path in as_paths['value']
+        ]
 
     def _parse_next_hop(self, path_attributes: list[OrderedDict]) -> list[str]:
         next_hop = self._get_path_attribute(
@@ -165,8 +159,6 @@ class RibParser(RouteUpdateParser):
             return None
 
         return extended_community['value']
-    
-
 
     def _parse_path_attributes(self, rib_entrie: list[OrderedDict]) -> PathAttributes:
         return PathAttributes(
@@ -197,9 +189,7 @@ class RibParser(RouteUpdateParser):
             extended_community=self._parse_extended_community(
                 path_attributes=rib_entrie,
             ),
-
         )
-
 
     def parse(self, statement: OrderedDict) -> list[RouteUpdate]:
         route_updates: list[RouteUpdate] = []
@@ -213,20 +203,19 @@ class RibParser(RouteUpdateParser):
             generic_update = RouteUpdate(
                 timestamp=datetime.fromtimestamp(
                     list((statement['timestamp'].keys()))[0]
-                    ),
-                peer_ip='None',
+                ),
+                peer_ip='',
                 local_ip=statement['prefix'],
                 peer_as=0,
                 local_as=0,
                 path_attributes = self._parse_path_attributes(entrie['path_attributes']),
+                change_type=ChangeType.ANNOUNCE,
                 nlri=NLRI(
                     prefix=statement['prefix'],
                     length=statement['length'],
-                )
+                ),
             )
             route_updates.append(generic_update) 
 
-
         self._send_messages(route_updates)
         return route_updates
-
