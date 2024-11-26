@@ -75,7 +75,6 @@ class MongoDBAdapter:
 
         @parser.on_update
         def on_update(message: RouteUpdate):
-
             # Saves optional, non-base-type attributes for later use; required to guarantee save use of mongodb
             if message.path_attributes.origin:
                 origins = message.path_attributes.origin.value
@@ -105,7 +104,7 @@ class MongoDBAdapter:
                         extended_community = [str(ext_com)]
                     else:
                         extended_community.append(str(ext_com)) 
-
+           
             # Creates dict for message with _id and other unique attributes, that don't change
             new_message_id = {
                 'timestamp' : message.timestamp,
@@ -206,7 +205,7 @@ class MongoDBAdapter:
                     if statistics_object:
                         new_values = {
                             '$set': {
-                                'change_count' : (statistics_object['change_count'] + 1),
+                                'change_count' : statistics_object['change_count'] + 1,
                                 'current_timestamp' : message.timestamp,
                                 'last_timestamp' : statistics_object['current_timestamp'],
                             }
@@ -220,5 +219,5 @@ class MongoDBAdapter:
                                 'nlri' : new_message_id['nlri'],
                                 '_id' : ObjectId(),
                             }
-                        }  
-                        statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
+                        }
+                    statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)

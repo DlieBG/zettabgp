@@ -11,8 +11,12 @@ Author:
     Sebastian Forstner <sef9869@thi.de>
 '''
 import src.services.mrt_simulation as mrt_simulation_service
+from src.adapters.rabbitmq import RabbitMQAdapter
+from src.adapters.mongodb import MongoDBAdapter
 import src.services.exabgp as exabgp_service
+from src.parsers.rib import RibParser
 from src.webapp import start_webapp
+from mrtparse import Reader
 import click
 
 @click.group()
@@ -204,3 +208,93 @@ def webapp(reload: bool):
     start_webapp(
         reload=reload,
     )
+
+@cli.command(
+    name='rib-load',
+    help='Load a rib-file in ZettaBGP.',
+)
+@click.option(
+    '--no-rabbitmq-direct',
+    '-d',
+    is_flag=True,
+)
+@click.option(
+    '--rabbitmq-grouped',
+    '-g',
+    type=int,
+    default=None,
+    show_default='5',
+    is_flag=False,
+    flag_value=5,
+    help='Queue group interval in minutes.',
+)
+@click.option(
+    '--no-mongodb-log',
+    '-l',
+    is_flag=True,
+)
+@click.option(
+    '--no-mongodb-state',
+    '-s',
+    is_flag=True,
+)
+@click.option(
+    '--no-mongodb-statistics',
+    '-t',
+    is_flag=True,
+)
+@click.option(
+    '--clear-mongodb',
+    '-c',
+    is_flag=True,
+)
+@click.argument(
+    'rib_file',
+    type=click.Path(
+        exists=True,
+        resolve_path=True,
+    ),
+)
+def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, rib_file: str):
+    '''
+    RIB Load command for retrieving BGP routes from RIB files and loading them.
+
+    Author:
+        Sebastian Forstner <sef9869@thi.de>
+
+    Args:
+        no_rabbitmq_direct (bool): Disable direct RabbitMQ direct queue..
+        rabbitmq_grouped (int): Queue group interval in minutes.
+        no_mongodb_log (bool): Disable logging to MongoDB.
+        no_mongodb_state (bool): Disable state storage to MongoDB.
+        no_mongodb_statistics (bool): Disable statistics storage to MongoDB.
+        clear_mongodb (bool): Clear MongoDB collections.
+        rib_file (str): RIB file to process.
+    '''
+    parser = RibParser()
+
+    if not no_rabbitmq_direct or rabbitmq_grouped:
+        RabbitMQAdapter(
+            parser=parser,
+            no_direct=no_rabbitmq_direct,
+            queue_interval=rabbitmq_grouped,
+        )
+    
+    if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
+        MongoDBAdapter(
+            parser=parser,
+            no_mongodb_log=no_mongodb_log,
+            no_mongodb_state=no_mongodb_state,
+            no_mongodb_statistics=no_mongodb_statistics,
+            clear_mongodb=clear_mongodb,
+        )
+
+    for message in Reader(rib_file):
+        if message.data['type'] != {13: 'TABLE_DUMP_V2'}:
+            print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
+            print(message.data['type'])
+            continue
+
+        parser.parse(
+            statement=message.data,
+        )
