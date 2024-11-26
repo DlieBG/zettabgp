@@ -1,9 +1,28 @@
+# -*- coding: utf-8 -*-
+'''
+ZettaBGP - Advanced Anomaly Detection in Internet Routing
+Copyright (c) 2024 Benedikt Schwering and Sebastian Forstner
+
+This work is licensed under the terms of the MIT license.
+For a copy, see LICENSE in the project root.
+
+Author:
+    Benedikt Schwering <bes9584@thi.de>
+    Sebastian Forstner <sef9869@thi.de>
+'''
 from src.models.route_update import PathAttributes, RouteUpdate, OriginType, Aggregator, ChangeType, AsPathType, AsPath, NLRI
 from src.parsers.route_update import RouteUpdateParser
 from collections import OrderedDict
 from datetime import datetime
 
 class RibParser(RouteUpdateParser):
+    '''
+    This class is responsible for parsing RIB messages.
+
+    Author:
+        Benedikt Schwering <bes9584@thi.de>
+        Sebastian Forstner <sef9869@thi.de>
+    '''
     def _get_path_attribute(self, path_attributes: list[OrderedDict], type: dict) -> dict:
         for path_attribute in path_attributes:
 
@@ -192,6 +211,19 @@ class RibParser(RouteUpdateParser):
         )
 
     def parse(self, statement: OrderedDict) -> list[RouteUpdate]:
+        '''
+        Parse a BGP4MP message.
+
+        Author:
+            Benedikt Schwering <bes9584@thi.de>
+            Sebastian Forstner <sef9869@thi.de>
+
+        Args:
+            statement (OrderedDict): The RIB statement.
+
+        Returns:
+            list[RouteUpdate]: The parsed RouteUpdate objects.
+        '''
         route_updates: list[RouteUpdate] = []
 
         if statement['subtype'].get(1) == 'PEER_INDEX_TABLE':

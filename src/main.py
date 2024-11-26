@@ -256,6 +256,21 @@ def webapp(reload: bool):
     ),
 )
 def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, rib_file: str):
+    '''
+    RIB Load command for retrieving BGP routes from RIB files and loading them.
+
+    Author:
+        Sebastian Forstner <sef9869@thi.de>
+
+    Args:
+        no_rabbitmq_direct (bool): Disable direct RabbitMQ direct queue..
+        rabbitmq_grouped (int): Queue group interval in minutes.
+        no_mongodb_log (bool): Disable logging to MongoDB.
+        no_mongodb_state (bool): Disable state storage to MongoDB.
+        no_mongodb_statistics (bool): Disable statistics storage to MongoDB.
+        clear_mongodb (bool): Clear MongoDB collections.
+        rib_file (str): RIB file to process.
+    '''
     parser = RibParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
