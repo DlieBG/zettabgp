@@ -14,10 +14,9 @@ from src.parsers.route_update import RouteUpdateParser
 from src.models.route_update import RouteUpdate
 from src.models.route_update import ChangeType
 from pymongo import MongoClient
+from datetime import datetime
 from typing import Optional
 from bson import ObjectId
-from datetime import datetime
-from collections import OrderedDict
 import os
 
 class MongoDBAdapter:
@@ -224,9 +223,28 @@ class MongoDBAdapter:
                         }
                     statistics_announce = statistics_collection.update_one(statistics_filter, new_values, upsert=True)
 
+class MongoDBLogLoader:
+    '''
+    This class is responsible for loading messages from the MongoDB Log.
 
-class DB_logoutput:
-    def load_messages(timestamp_start: datetime, timestamp_end: datetime):
+    Author:
+        Sebastian Forstner <sef9869@thi.de>
+    '''
+    @staticmethod
+    def load_messages(timestamp_start: datetime, timestamp_end: datetime) -> list[dict]:
+        '''
+        Loads messages from the MongoDB Log.
+
+        Author:
+            Sebastian Forstner <sef9869@thi.de>
+
+        Args:
+            timestamp_start (datetime): The start timestamp.
+            timestamp_end (datetime): The end timestamp.
+
+        Returns:
+            list[dict]: The loaded messages.
+        '''
         try:
             '''Connects to MongoDB-Container running with Docker'''
             database_client = MongoClient(

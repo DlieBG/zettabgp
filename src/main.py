@@ -10,10 +10,10 @@ Author:
     Benedikt Schwering <bes9584@thi.de>
     Sebastian Forstner <sef9869@thi.de>
 '''
-from src.adapters.mongodb import MongoDBAdapter, DB_logoutput
+from src.adapters.mongodb import MongoDBAdapter, MongoDBLogLoader
 import src.services.mrt_simulation as mrt_simulation_service
 from src.adapters.rabbitmq import RabbitMQAdapter
-from src.parsers.dbreverse import ReverseParser
+from src.parsers.reverse import ReverseParser
 import src.services.exabgp as exabgp_service
 from datetime import timedelta, datetime
 from src.parsers.rib import RibParser
@@ -367,28 +367,48 @@ def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bo
     '-b',
     type=float,
     default=None,
-    help='Starttime of replay as timestamp',
+    help='Starttime of replay as timestamp.',
 )
 @click.option(
     '--end-timestamp',
     '-e',
     type=float,
     default=None,
-    help='Endtime of replay as timestamp',
+    help='Endtime of replay as timestamp.',
 )
 @click.option(
     '--start-time',
     '-r',
     type=str,
-    help='Starttime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss',
+    help='Starttime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss.',
 )
 @click.option(
     '--end-time',
     '-f',
     type=str,
-    help='Endtime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss',
+    help='Endtime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss.',
 )
 def message_replay(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, start_timestamp: float, end_timestamp: float, start_time: str, end_time: str):
+    '''
+    Message replay command for replaying BGP messages from Database log.
+
+    Author:
+        Sebastian Forstner <sef9869@thi.de>
+
+    Args:
+        no_rabbitmq_direct (bool): Disable direct RabbitMQ direct queue..
+        rabbitmq_grouped (int): Queue group interval in minutes.
+        no_mongodb_log (bool): Disable logging to MongoDB.
+        no_mongodb_state (bool): Disable state storage to MongoDB.
+        no_mongodb_statistics (bool): Disable statistics storage to MongoDB.
+        clear_mongodb (bool): Clear MongoDB collections.
+        playback_speed (int): Playback speed in multiples of real time.
+        playback_interval (int): Playback interval in minutes.
+        start_timestamp (float): Starttime of replay as timestamp.
+        end_timestamp (float): Endtime of replay as timestamp.
+        start_time (str): Starttime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss.
+        end_time (str): Endtime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss.
+    '''
     parser = ReverseParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
@@ -405,13 +425,13 @@ def message_replay(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_l
     if start_timestamp and end_timestamp:
         start_time = datetime.fromtimestamp(start_timestamp)
         end_time = datetime.fromtimestamp(end_timestamp)
-        new_messages = DB_logoutput.load_messages(timestamp_start = start_time, timestamp_end = end_time)
+        new_messages = MongoDBLogLoader.load_messages(timestamp_start = start_time, timestamp_end = end_time)
     elif start_time and end_time: 
         time_start = datetime.fromisoformat(start_time)
         time_end = datetime.fromisoformat(end_time)
-        new_messages = DB_logoutput.load_messages(timestamp_start = time_start, timestamp_end = time_end)
+        new_messages = MongoDBLogLoader.load_messages(timestamp_start = time_start, timestamp_end = time_end)
     else:
-        new_messages = DB_logoutput.load_messages(timestamp_start = None, timestamp_end = None)
+        new_messages = MongoDBLogLoader.load_messages(timestamp_start = None, timestamp_end = None)
 
     # Copy messages in local list to avoid deleting them if -c is set; new_messages is corsor pointing to db
     all_messages: list[OrderedDict] = []
