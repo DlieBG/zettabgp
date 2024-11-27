@@ -184,6 +184,32 @@ Options:
   -c, --clear-mongodb
 ```
 
+#### `zettabgp message-replay`
+This command lets you load already saved BGP messages from the database and replays them.\
+You can use all options as in the `mrt-simulation` command. \
+Additionally you can give a timeframe for the messages you want to replay.
+
+```
+Options:
+  -d, --no-rabbitmq-direct
+  -g, --rabbitmq-grouped INTEGER  Queue group interval in minutes. [default: (5)]
+  -l, --no-mongodb-log
+  -s, --no-mongodb-state
+  -t, --no-mongodb-statistics
+  -c, --clear-mongodb
+  -p, --playback-speed INTEGER    Playback speed in multiples of real time. [default: (1)]
+  -o, --playback-interval INTEGER Playback interval in minutes. [default: (5)]
+  -b, --start-timestamp FLOAT Timestamp for the starttime of the replay
+  -e, --end-timestamp FLOAT Timestamp for the endtime of the replay
+  -r, --start-time STRING Time for the starttime of the replay, format (T is a set character): YYYY-MM-DDThh:mm:ss
+  -f, --end-time STRING Time for the endtime of the replay, format (T is a set character): YYYY-MM-DDThh:mm:ss
+```
+
+##### Timestamps and string as timeframe
+When using the `-b` option you must use the `-e` option aswell.\
+For `-r` and `-f` the same logic applies.\
+When no timeframe is provided or only one of the two necessary options is set, the whole database will be loaded and used for the replay.
+
 ## Debugging
 Some sample json messages for debugging purposes from ExaBGP can be found in the `samples` directory.
 
