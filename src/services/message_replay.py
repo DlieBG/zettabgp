@@ -12,12 +12,18 @@ Author:
 '''
 from src.adapters.mongodb import MongoDBAdapter, MongoDBLogLoader
 from src.adapters.rabbitmq import RabbitMQAdapter
+from src.models.route_update import ChangeType
 from src.parsers.reverse import ReverseParser
 from datetime import timedelta, datetime
 from collections import OrderedDict
+from pydantic import BaseModel
 import time
 
-def message_replay(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, start_timestamp: float, end_timestamp: float, start_time: str, end_time: str):
+class MessageReplayResult(BaseModel):
+    count_announce: int
+    count_withdraw: int
+
+def message_replay(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bool, no_mongodb_state: bool, no_mongodb_statistics: bool, clear_mongodb: bool, playback_speed: int, playback_interval: int, start_timestamp: float, end_timestamp: float, start_time: str, end_time: str) -> MessageReplayResult:
     '''
     Message replay service for replaying BGP messages from Database log.
 
@@ -37,7 +43,15 @@ def message_replay(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_l
         end_timestamp (float): Endtime of replay as timestamp.
         start_time (str): Starttime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss.
         end_time (str): Endtime of replay as time; in format (T is a set character): YYYY-MM-DDThh:mm:ss.
+
+    Returns:
+        MessageReplayResult: The message replay result.
     '''
+    message_replay_result = MessageReplayResult(
+        count_announce=0,
+        count_withdraw=0,
+    )
+
     parser = ReverseParser()
 
     if not no_rabbitmq_direct or rabbitmq_grouped:
@@ -94,4 +108,13 @@ def message_replay(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_l
             else:
                 playback_interval_stop = current_timestamp + timedelta(minutes=playback_interval)
 
-        parser.parse(message)
+        updates = parser.parse(message)
+
+        if updates:
+            for update in updates:
+                if update.change_type == ChangeType.ANNOUNCE:
+                    message_replay_result.count_announce += 1
+                elif update.change_type == ChangeType.WITHDRAW:
+                    message_replay_result.count_withdraw += 1
+
+    return message_replay_result

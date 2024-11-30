@@ -10,6 +10,7 @@ Author:
     Benedikt Schwering <bes9584@thi.de>
     Sebastian Forstner <sef9869@thi.de>
 '''
+from src.controllers.message_replay import message_replay_router
 from src.controllers.mrt_library import mrt_library_router
 from src.controllers.version import version_router
 from fastapi.staticfiles import StaticFiles
@@ -20,12 +21,16 @@ import uvicorn, os
 app = FastAPI()
 
 app.include_router(
+    router=message_replay_router,
+    prefix='/api/message-replay',
+)
+app.include_router(
     router=mrt_library_router,
-    prefix='/api/mrt-library'
+    prefix='/api/mrt-library',
 )
 app.include_router(
     router=version_router,
-    prefix='/api/version'
+    prefix='/api/version',
 )
 
 app.mount(
