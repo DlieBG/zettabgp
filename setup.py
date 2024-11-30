@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='ZettaBGP',
-    version='0.2.1',
+    version='0.2.2',
     description='',
     url='https://git.univ.leitwert.net/imprj/01-bgp-testbed/zettabgp',
     author='Benedikt Schwering & Sebastian Forstner',
