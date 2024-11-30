@@ -1,0 +1,75 @@
+<div class="body">
+    <mat-card appearance="outlined">
+        <h4>
+            Database Log Replay
+        </h4>
+
+        <div class="metadata">
+            <mat-checkbox [(ngModel)]="message_replay_request.no_rabbitmq_direct">No RabbitMQ Direct</mat-checkbox>
+            <mat-form-field appearance="outline">
+                <mat-label>RabbitMQ Grouped</mat-label>
+                <input matInput type="number" [(ngModel)]="message_replay_request.rabbitmq_grouped">
+                @if (message_replay_request.rabbitmq_grouped) {
+                <button matSuffix mat-icon-button aria-label="Clear" (click)="message_replay_request.rabbitmq_grouped=null">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+            </mat-form-field>
+            <mat-checkbox [(ngModel)]="message_replay_request.no_mongodb_log">No MongoDB Log</mat-checkbox>
+            <mat-checkbox [(ngModel)]="message_replay_request.no_mongodb_state">No MongoDB State</mat-checkbox>
+            <mat-checkbox [(ngModel)]="message_replay_request.no_mongodb_statistics">No MongoDB Statistics</mat-checkbox>
+            <mat-checkbox [(ngModel)]="message_replay_request.clear_mongodb">Clear MongoDB</mat-checkbox>
+            <mat-form-field appearance="outline">
+                <mat-label>Playback Speed</mat-label>
+                <input matInput type="number" [(ngModel)]="message_replay_request.playback_speed">
+                @if (message_replay_request.rabbitmq_grouped) {
+                <button matSuffix mat-icon-button aria-label="Clear" (click)="message_replay_request.playback_speed=null">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+            </mat-form-field>
+        </div>
+
+        <hr>
+
+        <div class="timespan">
+            <mat-form-field appearance="outline">
+                <mat-label>Start Time</mat-label>
+                <input matInput type="datetime-local" [(ngModel)]="message_replay_request.start_time">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>End Time</mat-label>
+                <input matInput type="datetime-local" [(ngModel)]="message_replay_request.end_time">
+            </mat-form-field>
+        </div>
+
+        <hr>
+
+        <div class="action">
+            <button mat-stroked-button color="accent" (click)="startMessageReplay()">
+                Replay
+            </button>
+
+            <div class="response">
+                @if (messageReplayResponse$) {
+                @if (messageReplayResponse$ | async; as messageReplayResponse) {
+                <div class="success">
+                    <mat-icon>check_circle</mat-icon>
+                    <div>
+                        <div>
+                            Announced Routes: {{ messageReplayResponse.count_announce }}
+                        </div>
+                        <div>
+                            Withdrawn Routes: {{ messageReplayResponse.count_withdraw }}
+                        </div>
+                    </div>
+                </div>
+                }
+                @else {
+                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                }
+                }
+            </div>
+        </div>
+    </mat-card>
+</div>
