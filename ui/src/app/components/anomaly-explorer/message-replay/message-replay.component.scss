@@ -1,0 +1,58 @@
+.body {
+    margin: 2em;
+}
+
+mat-card {
+    min-width: 750px;
+    padding: 1em;
+}
+
+h4 {
+    font-size: 24px;
+}
+
+hr {
+    width: 100%;
+}
+
+.metadata {
+    display: flex;
+    flex-direction: column;
+}
+
+mat-form-field {
+    margin-top: 1em;
+    width: 100%;
+}
+
+.timespan {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+}
+
+.action {
+    display: flex;
+    align-items: center;
+    margin-top: 1em;
+    min-height: 48px;
+}
+
+button {
+    margin-right: 3em;
+}
+
+.response {
+    width: 100%;
+    margin-right: 1em;
+}
+
+.success {
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+        color: forestgreen;
+        margin-right: 1em;
+    }
+}
