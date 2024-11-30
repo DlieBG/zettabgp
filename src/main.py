@@ -12,13 +12,9 @@ Author:
 '''
 import src.services.mrt_simulation as mrt_simulation_service
 import src.services.message_replay as message_replay_service
-from src.adapters.rabbitmq import RabbitMQAdapter
-from src.adapters.mongodb import MongoDBAdapter
+import src.services.rib_load as rib_load_service
 import src.services.exabgp as exabgp_service
-from src.parsers.rib import RibParser
 from src.webapp import start_webapp
-from mrtparse import Reader
-from rich import print
 import click
 
 @click.group()
@@ -273,33 +269,15 @@ def rib_load(no_rabbitmq_direct: bool, rabbitmq_grouped: int, no_mongodb_log: bo
         clear_mongodb (bool): Clear MongoDB collections.
         rib_file (str): RIB file to process.
     '''
-    parser = RibParser()
-
-    if not no_rabbitmq_direct or rabbitmq_grouped:
-        RabbitMQAdapter(
-            parser=parser,
-            no_direct=no_rabbitmq_direct,
-            queue_interval=rabbitmq_grouped,
-        )
-
-    if not no_mongodb_log or not no_mongodb_state or not no_mongodb_statistics:
-        MongoDBAdapter(
-            parser=parser,
-            no_mongodb_log=no_mongodb_log,
-            no_mongodb_state=no_mongodb_state,
-            no_mongodb_statistics=no_mongodb_statistics,
-            clear_mongodb=clear_mongodb,
-        )
-
-    for message in Reader(rib_file):
-        if message.data['type'] != {13: 'TABLE_DUMP_V2'}:
-            print('[dark_orange]\[WARN][/] Skipping unsupported MRT type: ', end='')
-            print(message.data['type'])
-            continue
-
-        parser.parse(
-            statement=message.data,
-        )
+    rib_load_service.rib_load(
+        no_rabbitmq_direct=no_rabbitmq_direct,
+        rabbitmq_grouped=rabbitmq_grouped,
+        no_mongodb_log=no_mongodb_log,
+        no_mongodb_state=no_mongodb_state,
+        no_mongodb_statistics=no_mongodb_statistics,
+        clear_mongodb=clear_mongodb,
+        rib_file=rib_file,
+    )
 
 @cli.command(
     name='message-replay',
