@@ -66,6 +66,10 @@ class RabbitMQAdapter:
             queue_name='test_grouped_route_updates',
             routing_key='grouped',
         )
+        _declare_test_queue(
+            queue_name='test_direct_route_updates_team2',
+            routing_key='direct_team2',
+        )
 
         if not no_direct:
             @parser.on_update
@@ -74,6 +78,11 @@ class RabbitMQAdapter:
                     exchange='zettabgp',
                     body=message.model_dump_json(),
                     routing_key='direct',
+                )
+                channel.basic_publish(
+                    exchange='zettabgp',
+                    body=message.model_dump_json(),
+                    routing_key='direct_team2',
                 )
 
         if queue_interval:
