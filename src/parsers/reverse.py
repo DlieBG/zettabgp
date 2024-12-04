@@ -74,17 +74,6 @@ class ReverseParser(RouteUpdateParser):
 
         return new_aggregator
 
-    def _parse_extendet_community(self, ext_com: Optional[list[str]]) -> Optional[list[int]]:
-        all_aggregators: Optional[list[int]] = None
-        if ext_com:
-            for com in ext_com:
-                if all_aggregators:
-                    all_aggregators.append(int(com))
-                else:
-                    all_aggregators = [int(com)]
-
-        return all_aggregators
-
     def _parse_nlri(self, nlri: dict) -> NLRI:
         new_nlri = NLRI(
             prefix=nlri['prefix'],
@@ -131,7 +120,7 @@ class ReverseParser(RouteUpdateParser):
             aggregator=aggregators,
             community=message_data['path_attributes']['community'],
             large_community=message_data['path_attributes']['large_community'],
-            extended_community=self._parse_extendet_community(message_data['path_attributes']['extended_community']),
+            extended_community=message_data['path_attributes']['extended_community'],
             orginator_id=message_data['path_attributes']['orginator_id'],
             cluster_list=message_data['path_attributes']['cluster_list'],
         )

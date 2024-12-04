@@ -94,7 +94,7 @@ class PathAttributes(BaseModel):
     aggregator: Optional[Aggregator] = None
     community: Optional[list[list[int]]] = None
     large_community: Optional[list[list[int]]] = None
-    extended_community: Optional[list[int]] = None
+    extended_community: Optional[list[str]] = None
     orginator_id: Optional[str] = None
     cluster_list: Optional[list[str]] = None
 
