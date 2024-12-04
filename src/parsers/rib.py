@@ -168,7 +168,17 @@ class RibParser(RouteUpdateParser):
                 for c in large_community['value']
         ]
     
-    def _parse_extended_community(self, path_attributes: list[OrderedDict]) -> list[int]:
+    def _convert_to_ipv4(val: int) -> str:
+        p1 = val >> 24
+        p2 = (val - (p1 << 24)) >> 16
+        p3 = (val - (p1 << 24) - (p2 << 16)) >> 8
+        p4 = (val - (p1 << 24) - (p2 << 16) - (p3 << 8))
+
+        ip = str(p1) + '.' + str(p2) + '.' + str(p3) + '.' + str(p4) 
+
+        return ip
+    
+    def _parse_extended_community(self, path_attributes: list[OrderedDict]) -> list[str]:
         extended_community = self._get_path_attribute(
             path_attributes=path_attributes,
             type={16: 'EXTENDED COMMUNITIES'},
@@ -177,7 +187,49 @@ class RibParser(RouteUpdateParser):
         if extended_community is None:
             return None
 
-        return extended_community['value']
+        ext_communities: list[str] = []
+
+        for ext in extended_community['value']:
+            ext_type = format((ext >> 56), '#02x')
+            ext_subtype = format(((ext >> 48)-((ext >> 56) << 8)), '#02x')
+            ext_value = ext - ((ext >> 48) << 48)
+
+            match ext_type:
+                case '0x00' | '0x40' | '0x0' | '0x4':
+                    # 2 octets used for global administration as AS number
+                    # 4 octets used for local administration with unique value
+                    ext_gl = ext_value >> 32
+                    ext_loc = ext_value - (ext_gl << 32)
+                    ext_str = str(ext_type) + ':' + str(ext_subtype) + ':' + str(ext_gl) + ':' + str(ext_loc)
+                case '0x01' | '0x41':
+                    # 4 octets used for global administration as IPv4 Address
+                    # 2 octets used for local administration with unique value
+                    ext_gl_num = ext_value >> 16
+                    ext_loc = ext_value - (ext_gl_num << 16)
+                    ext_gl_ip = self._convert_to_ipv4(
+                        val=ext_gl_num,
+                    )
+                    ext_str = str(ext_type) + ':' + str(ext_subtype) + ':' + ext_gl_ip + ':' + str(ext_loc)
+                case '0x02' | '0x42':
+                    # 4 octets used for global administration as AS number
+                    # 2 octets used for local administration with unique value
+                    ext_gl = ext_value >> 16
+                    ext_loc = ext_value - (ext_gl << 16)
+                    ext_str = str(ext_type) + ':' + str(ext_subtype) + ':' + str(ext_gl) + ':' + str(ext_loc)
+                case '0x03' | '0x43':
+                    # Value separation not defined; last 6 octets can be used flexible
+                    # Current representation as one number, because cant be separated without more knowledge
+                    ext_str = str(ext_type) + ':' + str(ext_subtype) + ':' + str(ext_value) + ':'
+                case _:
+                    # Other types not represented in the most common cases
+                    # Example: 0x80-0x8f and 0xc0-0xcf for experimental type
+                    # Missing documentation for clear distinction
+                    # Representation therefore like in previous case
+                    ext_str = str(ext_type) + ':' + str(ext_subtype) + ':' + str(ext_value) + ':'
+
+            ext_communities.append(ext_str)
+
+        return ext_communities
 
     def _parse_path_attributes(self, rib_entrie: list[OrderedDict]) -> PathAttributes:
         return PathAttributes(
