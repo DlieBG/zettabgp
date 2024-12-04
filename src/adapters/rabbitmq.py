@@ -34,6 +34,8 @@ class RabbitMQAdapter:
             no_direct (bool): Whether to disable the direct route updates.
             queue_interval (int): The interval in minutes to group the route updates.
         '''
+        global channel
+
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=os.getenv('RABBIT_MQ_HOST', 'localhost'),
@@ -70,6 +72,13 @@ class RabbitMQAdapter:
         if not no_direct:
             @parser.on_update
             def direct(message: RouteUpdate):
+                global channel
+
+                # Check if channel is closed and create a new one
+                # Necessary when triggering multiple scenarios in a row
+                if channel.is_closed:
+                    channel = connection.channel()
+                
                 channel.basic_publish(
                     exchange='zettabgp',
                     body=message.model_dump_json(),
