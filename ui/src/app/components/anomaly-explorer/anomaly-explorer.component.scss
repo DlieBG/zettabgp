@@ -1,4 +1,22 @@
 .body {
+    height: 100%;
     display: flex;
     justify-content: center;
+    align-items: center;
+}
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
+    mat-icon {
+        zoom: 2;
+        color: brown;
+    }
+
+    .comming-soon {
+        font-size: 1.5em;
+        color: grey;
+    }
 }
