@@ -13,7 +13,7 @@ export class MessageReplayService {
   ) { }
 
   startMessageReplay(MessageReplayRequest: MessageReplayRequest): Observable<MessageReplayResponse> {
-    return this.httpClient.post<MessageReplayResponse>('api/message-replay', MessageReplayRequest);
+    return this.httpClient.post<MessageReplayResponse>('api/message-replay/', MessageReplayRequest);
   }
 
 }

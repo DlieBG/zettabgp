@@ -18,10 +18,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { RabbitmqComponent } from './components/rabbitmq/rabbitmq.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MessageReplayComponent } from './components/anomaly-explorer/message-replay/message-replay.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ManualReplayComponent } from './components/manual-replay/manual-replay.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +31,7 @@ import { MatInputModule } from '@angular/material/input';
     AnomalyExplorerComponent,
     MrtScenarioComponent,
     RabbitmqComponent,
-    MessageReplayComponent
+    ManualReplayComponent
   ],
   imports: [
     BrowserModule,

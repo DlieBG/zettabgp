@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
+import { MessageReplayResponse } from '../../types/message-replay.type';
 import { Observable } from 'rxjs';
-import { MessageReplayRequest, MessageReplayResponse } from '../../../types/message-replay.type';
-import { MessageReplayService } from '../../../services/message-replay/message-replay.service';
+import { MessageReplayService } from '../../services/message-replay/message-replay.service';
 
 @Component({
-  selector: 'app-message-replay',
-  templateUrl: './message-replay.component.html',
-  styleUrl: './message-replay.component.scss'
+  selector: 'app-manual-replay',
+  templateUrl: './manual-replay.component.html',
+  styleUrl: './manual-replay.component.scss'
 })
-export class MessageReplayComponent {
+export class ManualReplayComponent {
   rabbitmq_direct = true;
   rabbitmq_grouped = null;
   mongodb_log = false;
