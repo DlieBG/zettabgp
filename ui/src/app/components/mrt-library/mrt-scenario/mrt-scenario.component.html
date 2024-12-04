@@ -6,9 +6,9 @@
 
             <table>
                 <tr>
-                    <td>No RabbitMQ Direct:</td>
+                    <td>RabbitMQ Direct:</td>
                     <td>
-                        <pre>{{ mrtScenario.no_rabbitmq_direct | json }}</pre>
+                        <pre>{{ !mrtScenario.no_rabbitmq_direct | json }}</pre>
                     </td>
                 </tr>
                 <tr>
@@ -18,21 +18,21 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>No MongoDB Log:</td>
+                    <td>MongoDB Log:</td>
                     <td>
-                        <pre>{{ mrtScenario.no_mongodb_log | json }}</pre>
+                        <pre>{{ !mrtScenario.no_mongodb_log | json }}</pre>
                     </td>
                 </tr>
                 <tr>
-                    <td>No MongoDB State:</td>
+                    <td>MongoDB State:</td>
                     <td>
-                        <pre>{{ mrtScenario.no_mongodb_state | json }}</pre>
+                        <pre>{{ !mrtScenario.no_mongodb_state | json }}</pre>
                     </td>
                 </tr>
                 <tr>
-                    <td>No MongoDB Statistics:</td>
+                    <td>MongoDB Statistics:</td>
                     <td>
-                        <pre>{{ mrtScenario.no_mongodb_statistics | json }}</pre>
+                        <pre>{{ !mrtScenario.no_mongodb_statistics | json }}</pre>
                     </td>
                 </tr>
                 <tr>

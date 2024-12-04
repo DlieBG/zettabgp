@@ -5,25 +5,25 @@
         </h4>
 
         <div class="metadata">
-            <mat-checkbox [(ngModel)]="message_replay_request.no_rabbitmq_direct">No RabbitMQ Direct</mat-checkbox>
+            <mat-checkbox [(ngModel)]="rabbitmq_direct">RabbitMQ Direct</mat-checkbox>
             <mat-form-field appearance="outline">
                 <mat-label>RabbitMQ Grouped</mat-label>
-                <input matInput type="number" [(ngModel)]="message_replay_request.rabbitmq_grouped">
-                @if (message_replay_request.rabbitmq_grouped) {
-                <button matSuffix mat-icon-button aria-label="Clear" (click)="message_replay_request.rabbitmq_grouped=null">
+                <input matInput type="number" [(ngModel)]="rabbitmq_grouped">
+                @if (rabbitmq_grouped) {
+                <button matSuffix mat-icon-button aria-label="Clear" (click)="rabbitmq_grouped=null">
                     <mat-icon>close</mat-icon>
                 </button>
                 }
             </mat-form-field>
-            <mat-checkbox [(ngModel)]="message_replay_request.no_mongodb_log">No MongoDB Log</mat-checkbox>
-            <mat-checkbox [(ngModel)]="message_replay_request.no_mongodb_state">No MongoDB State</mat-checkbox>
-            <mat-checkbox [(ngModel)]="message_replay_request.no_mongodb_statistics">No MongoDB Statistics</mat-checkbox>
-            <mat-checkbox [(ngModel)]="message_replay_request.clear_mongodb">Clear MongoDB</mat-checkbox>
+            <mat-checkbox [(ngModel)]="mongodb_log">MongoDB Log</mat-checkbox>
+            <mat-checkbox [(ngModel)]="mongodb_state">MongoDB State</mat-checkbox>
+            <mat-checkbox [(ngModel)]="mongodb_statistics">MongoDB Statistics</mat-checkbox>
+            <mat-checkbox [(ngModel)]="clear_mongodb">Clear MongoDB</mat-checkbox>
             <mat-form-field appearance="outline">
                 <mat-label>Playback Speed</mat-label>
-                <input matInput type="number" [(ngModel)]="message_replay_request.playback_speed">
-                @if (message_replay_request.rabbitmq_grouped) {
-                <button matSuffix mat-icon-button aria-label="Clear" (click)="message_replay_request.playback_speed=null">
+                <input matInput type="number" [(ngModel)]="playback_speed">
+                @if (playback_speed) {
+                <button matSuffix mat-icon-button aria-label="Clear" (click)="playback_speed=null">
                     <mat-icon>close</mat-icon>
                 </button>
                 }
@@ -35,11 +35,11 @@
         <div class="timespan">
             <mat-form-field appearance="outline">
                 <mat-label>Start Time</mat-label>
-                <input matInput type="datetime-local" [(ngModel)]="message_replay_request.start_time">
+                <input matInput type="datetime-local" [(ngModel)]="start_time">
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>End Time</mat-label>
-                <input matInput type="datetime-local" [(ngModel)]="message_replay_request.end_time">
+                <input matInput type="datetime-local" [(ngModel)]="end_time">
             </mat-form-field>
         </div>
 
@@ -72,4 +72,5 @@
             </div>
         </div>
     </mat-card>
+
 </div>

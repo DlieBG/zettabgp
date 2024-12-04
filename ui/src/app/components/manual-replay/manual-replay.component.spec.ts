@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MessageReplayComponent } from './message-replay.component';
+import { ManualReplayComponent } from './manual-replay.component';
 
-describe('MessageReplayComponent', () => {
-  let component: MessageReplayComponent;
-  let fixture: ComponentFixture<MessageReplayComponent>;
+describe('ManualReplayComponent', () => {
+  let component: ManualReplayComponent;
+  let fixture: ComponentFixture<ManualReplayComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [MessageReplayComponent]
+      declarations: [ManualReplayComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MessageReplayComponent);
+    fixture = TestBed.createComponent(ManualReplayComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
