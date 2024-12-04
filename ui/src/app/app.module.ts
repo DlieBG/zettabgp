@@ -22,6 +22,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ManualReplayComponent } from './components/manual-replay/manual-replay.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ConnectionHelperComponent } from './components/rabbitmq/connection-helper/connection-helper.component';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 @NgModule({
   declarations: [
@@ -31,7 +34,8 @@ import { ManualReplayComponent } from './components/manual-replay/manual-replay.
     AnomalyExplorerComponent,
     MrtScenarioComponent,
     RabbitmqComponent,
-    ManualReplayComponent
+    ManualReplayComponent,
+    ConnectionHelperComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +52,8 @@ import { ManualReplayComponent } from './components/manual-replay/manual-replay.
     MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
+    MatDialogModule,
+    ClipboardModule,
   ],
   providers: [
     provideAnimationsAsync(),

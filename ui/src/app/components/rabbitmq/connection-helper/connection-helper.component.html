@@ -1,0 +1,18 @@
+<div class="body">
+    <h4>
+        Testbed SSH Tunnel
+    </h4>
+
+    <p>
+        To access the RabbitMQ Management UI, you must first establish a SSH tunnel to the testbed.
+    </p>
+
+    <div class="frame">
+        <pre>{{ ssh_command }}</pre>
+    </div>
+
+    <button mat-stroked-button color="accent" [cdkCopyToClipboard]="ssh_command">
+        <mat-icon>content_copy</mat-icon>
+        Copy
+    </button>
+</div>
