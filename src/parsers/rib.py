@@ -233,33 +233,33 @@ class RibParser(RouteUpdateParser):
 
     def _parse_path_attributes(self, rib_entrie: list[OrderedDict]) -> PathAttributes:
         return PathAttributes(
-            origin = self._parse_origin(
-                path_attributes = rib_entrie
-            ),
+            # origin = self._parse_origin(
+            #     path_attributes = rib_entrie
+            # ),
             as_path=self._parse_as_path(
                 path_attributes=rib_entrie,
             ),
-            next_hop=self._parse_next_hop(
-                path_attributes=rib_entrie,
-            ),
-            multi_exit_disc=self._parse_multi_exit_disc(
-                path_attributes=rib_entrie,
-            ),
-            atomic_aggregate=self._parse_atomic_aggregate(
-                path_attributes=rib_entrie,
-            ),
-            aggregator=self._parse_aggregator(
-                path_attributes=rib_entrie,
-            ),
-            community=self._parse_community(
-                path_attributes=rib_entrie,
-            ),
-            large_community=self._parse_large_community(
-                path_attributes=rib_entrie,
-            ),
-            extended_community=self._parse_extended_community(
-                path_attributes=rib_entrie,
-            ),
+            # next_hop=self._parse_next_hop(
+            #     path_attributes=rib_entrie,
+            # ),
+            # multi_exit_disc=self._parse_multi_exit_disc(
+            #     path_attributes=rib_entrie,
+            # ),
+            # atomic_aggregate=self._parse_atomic_aggregate(
+            #     path_attributes=rib_entrie,
+            # ),
+            # aggregator=self._parse_aggregator(
+            #     path_attributes=rib_entrie,
+            # ),
+            # community=self._parse_community(
+            #     path_attributes=rib_entrie,
+            # ),
+            # large_community=self._parse_large_community(
+            #     path_attributes=rib_entrie,
+            # ),
+            # extended_community=self._parse_extended_community(
+            #     path_attributes=rib_entrie,
+            # ),
         )
 
     def parse(self, statement: OrderedDict) -> list[RouteUpdate]:
