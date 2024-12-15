@@ -110,19 +110,20 @@ class ReverseParser(RouteUpdateParser):
             aggregators = self._parse_aggregator(dict(message_data['path_attributes']['aggregator']))
         else:
             aggregators = None
+        
         new_path_attribute = PathAttributes(
-            origin=self._parse_origin(message_data['path_attributes']['origin']),
+            # origin=self._parse_origin(message_data['path_attributes']['origin']),
             as_path=self._parse_as_path(message_data['path_attributes']['as_path']),
-            next_hop=message_data['path_attributes']['next_hop'],
-            multi_exit_disc=message_data['path_attributes']['multi_exit_disc'],
-            local_pref=message_data['path_attributes']['local_pref'],
-            atomic_aggregate=message_data['path_attributes']['atomic_aggregate'],
-            aggregator=aggregators,
-            community=message_data['path_attributes']['community'],
-            large_community=message_data['path_attributes']['large_community'],
-            extended_community=message_data['path_attributes']['extended_community'],
-            orginator_id=message_data['path_attributes']['orginator_id'],
-            cluster_list=message_data['path_attributes']['cluster_list'],
+            # next_hop=message_data['path_attributes']['next_hop'],
+            # multi_exit_disc=message_data['path_attributes']['multi_exit_disc'],
+            # local_pref=message_data['path_attributes']['local_pref'],
+            # atomic_aggregate=message_data['path_attributes']['atomic_aggregate'],
+            # aggregator=aggregators,
+            # community=message_data['path_attributes']['community'],
+            # large_community=message_data['path_attributes']['large_community'],
+            # extended_community=message_data['path_attributes']['extended_community'],
+            # orginator_id=message_data['path_attributes']['orginator_id'],
+            # cluster_list=message_data['path_attributes']['cluster_list'],
         )
         new_route_update = RouteUpdate(
             timestamp=message_data['timestamp'],

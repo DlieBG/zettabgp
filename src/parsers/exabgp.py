@@ -119,28 +119,28 @@ class ExaBGPParser(RouteUpdateParser):
         attribute: dict = exabgp_message['neighbor']['message']['update'].get('attribute', {})
 
         return PathAttributes(
-            origin=self._parse_origin(
-                origin=attribute.get('origin'),
-            ),
+            # origin=self._parse_origin(
+            #     origin=attribute.get('origin'),
+            # ),
             as_path=self._parse_as_path(
                 as_path=attribute.get('as-path'),
             ),
-            # According to the ExaBGP documentation, the next-hop attribute is only one ip address.
-            # https://github.com/Exa-Networks/exabgp/wiki/Controlling-ExaBGP-:-API-for-received-messages#update-announcement-receive-routes
-            next_hop=None if next_hop is None else [next_hop],
-            multi_exit_disc=attribute.get('med'),
-            local_pref=attribute.get('local-preference'),
-            atomic_aggregate=attribute.get('atomic-aggregate'),
-            aggregator=self._parse_aggregator(
-                aggregator=attribute.get('aggregator'),
-            ),
-            community=attribute.get('community'),
-            large_community=attribute.get('large-community'),
-            extended_community=self._parse_extended_community(
-                extended_community=attribute.get('extended-community'),
-            ),
-            orginator_id=attribute.get('originator-id'),
-            cluster_list=attribute.get('cluster-list'),
+            # # According to the ExaBGP documentation, the next-hop attribute is only one ip address.
+            # # https://github.com/Exa-Networks/exabgp/wiki/Controlling-ExaBGP-:-API-for-received-messages#update-announcement-receive-routes
+            # next_hop=None if next_hop is None else [next_hop],
+            # multi_exit_disc=attribute.get('med'),
+            # local_pref=attribute.get('local-preference'),
+            # atomic_aggregate=attribute.get('atomic-aggregate'),
+            # aggregator=self._parse_aggregator(
+            #     aggregator=attribute.get('aggregator'),
+            # ),
+            # community=attribute.get('community'),
+            # large_community=attribute.get('large-community'),
+            # extended_community=self._parse_extended_community(
+            #     extended_community=attribute.get('extended-community'),
+            # ),
+            # orginator_id=attribute.get('originator-id'),
+            # cluster_list=attribute.get('cluster-list'),
         )
 
     def parse(self, line: str) -> list[RouteUpdate]:

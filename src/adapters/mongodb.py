@@ -76,11 +76,11 @@ class MongoDBAdapter:
 
         @parser.on_update
         def on_update(message: RouteUpdate):
-            # Saves optional, non-base-type attributes for later use; required to guarantee save use of mongodb
-            if message.path_attributes.origin:
-                origins = message.path_attributes.origin.value
-            else:
-                origins = None
+            # # Saves optional, non-base-type attributes for later use; required to guarantee save use of mongodb
+            # if message.path_attributes.origin:
+            #     origins = message.path_attributes.origin.value
+            # else:
+            #     origins = None
             
             as_paths: Optional[list[int, list[int]]] = None
             if message.path_attributes.as_path:
@@ -90,13 +90,13 @@ class MongoDBAdapter:
                     else:
                         as_paths.append([as_pa.type.value, as_pa.value])
                  
-            if message.path_attributes.aggregator:
-                aggregator = {
-                    'router_id' : message.path_attributes.aggregator.router_id,
-                    'router_as' : message.path_attributes.aggregator.router_as,
-                    }
-            else:
-                 aggregator = None
+            # if message.path_attributes.aggregator:
+            #     aggregator = {
+            #         'router_id' : message.path_attributes.aggregator.router_id,
+            #         'router_as' : message.path_attributes.aggregator.router_as,
+            #         }
+            # else:
+            #      aggregator = None
 
             # Creates dict for message with _id and other unique attributes, that don't change
             new_message_id = {
@@ -111,18 +111,18 @@ class MongoDBAdapter:
                     'length' : message.nlri.length,
                 },
                 'path_attributes': {
-                    'origin' : origins,
+                    # 'origin' : origins,
                     'as_path' : as_paths,
-                    'next_hop' : message.path_attributes.next_hop,
-                    'multi_exit_disc' : message.path_attributes.multi_exit_disc,
-                    'local_pref' : message.path_attributes.local_pref,
-                    'atomic_aggregate' : message.path_attributes.atomic_aggregate,
-                    'aggregator' : aggregator,
-                    'community' : message.path_attributes.community,
-                    'large_community' : message.path_attributes.large_community,
-                    'extended_community' : message.path_attributes.extended_community,
-                    'orginator_id' : message.path_attributes.orginator_id,
-                    'cluster_list' : message.path_attributes.cluster_list,
+                    # 'next_hop' : message.path_attributes.next_hop,
+                    # 'multi_exit_disc' : message.path_attributes.multi_exit_disc,
+                    # 'local_pref' : message.path_attributes.local_pref,
+                    # 'atomic_aggregate' : message.path_attributes.atomic_aggregate,
+                    # 'aggregator' : aggregator,
+                    # 'community' : message.path_attributes.community,
+                    # 'large_community' : message.path_attributes.large_community,
+                    # 'extended_community' : message.path_attributes.extended_community,
+                    # 'orginator_id' : message.path_attributes.orginator_id,
+                    # 'cluster_list' : message.path_attributes.cluster_list,
                 },
                 '_id' : ObjectId(),
             }
@@ -135,18 +135,18 @@ class MongoDBAdapter:
                     'peer_as' : message.peer_as,
                     'change_type' : message.change_type.value,
                     'path_attributes': {
-                       'origin' : origins,
+                    #    'origin' : origins,
                         'as_path' : as_paths,
-                        'next_hop' : message.path_attributes.next_hop,
-                        'multi_exit_disc' : message.path_attributes.multi_exit_disc,
-                        'local_pref' : message.path_attributes.local_pref,
-                        'atomic_aggregate' : message.path_attributes.atomic_aggregate,
-                        'aggregator' : aggregator,
-                        'community' : message.path_attributes.community,
-                        'large_community' : message.path_attributes.large_community,
-                        'extended_community' : message.path_attributes.extended_community,
-                        'orginator_id' : message.path_attributes.orginator_id,
-                        'cluster_list' : message.path_attributes.cluster_list,
+                        # 'next_hop' : message.path_attributes.next_hop,
+                        # 'multi_exit_disc' : message.path_attributes.multi_exit_disc,
+                        # 'local_pref' : message.path_attributes.local_pref,
+                        # 'atomic_aggregate' : message.path_attributes.atomic_aggregate,
+                        # 'aggregator' : aggregator,
+                        # 'community' : message.path_attributes.community,
+                        # 'large_community' : message.path_attributes.large_community,
+                        # 'extended_community' : message.path_attributes.extended_community,
+                        # 'orginator_id' : message.path_attributes.orginator_id,
+                        # 'cluster_list' : message.path_attributes.cluster_list,
                     },
                 }
             }

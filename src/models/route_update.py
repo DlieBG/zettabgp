@@ -85,18 +85,18 @@ class PathAttributes(BaseModel):
     Author:
         Benedikt Schwering <bes9584@thi.de>
     '''
-    origin: Optional[OriginType] = None
+    # origin: Optional[OriginType] = None
     as_path: Optional[list[AsPath]] = None
-    next_hop: Optional[list[str]] = None
-    multi_exit_disc: Optional[int] = None
-    local_pref: Optional[int] = None
-    atomic_aggregate: Optional[bool] = None
-    aggregator: Optional[Aggregator] = None
-    community: Optional[list[list[int]]] = None
-    large_community: Optional[list[list[int]]] = None
-    extended_community: Optional[list[str]] = None
-    orginator_id: Optional[str] = None
-    cluster_list: Optional[list[str]] = None
+    # next_hop: Optional[list[str]] = None
+    # multi_exit_disc: Optional[int] = None
+    # local_pref: Optional[int] = None
+    # atomic_aggregate: Optional[bool] = None
+    # aggregator: Optional[Aggregator] = None
+    # community: Optional[list[list[int]]] = None
+    # large_community: Optional[list[list[int]]] = None
+    # extended_community: Optional[list[str]] = None
+    # orginator_id: Optional[str] = None
+    # cluster_list: Optional[list[str]] = None
 
 class RouteUpdate(BaseModel):
     '''

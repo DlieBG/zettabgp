@@ -245,33 +245,33 @@ class MrtBgp4MpParser(RouteUpdateParser):
 
     def _parse_path_attributes(self, path_attributes: list[dict]) -> PathAttributes:
         return PathAttributes(
-            origin=self._parse_origin(
-                path_attributes=path_attributes,
-            ),
+            # origin=self._parse_origin(
+            #     path_attributes=path_attributes,
+            # ),
             as_path=self._parse_as_path(
                 path_attributes=path_attributes,
             ),
-            next_hop=self._parse_next_hop(
-                path_attributes=path_attributes,
-            ),
-            multi_exit_disc=self._parse_multi_exit_disc(
-                path_attributes=path_attributes,
-            ),
-            atomic_aggregate=self._parse_atomic_aggregate(
-                path_attributes=path_attributes,
-            ),
-            aggregator=self._parse_aggregator(
-                path_attributes=path_attributes,
-            ),
-            community=self._parse_community(
-                path_attributes=path_attributes,
-            ),
-            large_community=self._parse_large_community(
-                path_attributes=path_attributes,
-            ),
-            extended_community=self._parse_extended_community(
-                path_attributes=path_attributes,
-            ),
+            # next_hop=self._parse_next_hop(
+            #     path_attributes=path_attributes,
+            # ),
+            # multi_exit_disc=self._parse_multi_exit_disc(
+            #     path_attributes=path_attributes,
+            # ),
+            # atomic_aggregate=self._parse_atomic_aggregate(
+            #     path_attributes=path_attributes,
+            # ),
+            # aggregator=self._parse_aggregator(
+            #     path_attributes=path_attributes,
+            # ),
+            # community=self._parse_community(
+            #     path_attributes=path_attributes,
+            # ),
+            # large_community=self._parse_large_community(
+            #     path_attributes=path_attributes,
+            # ),
+            # extended_community=self._parse_extended_community(
+            #     path_attributes=path_attributes,
+            # ),
         )
 
     def _parse_mp_reach_nlri(self, path_attributes: list[OrderedDict]) -> list[NLRI]:
